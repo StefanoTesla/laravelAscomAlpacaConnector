@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ObservingConditionController;
+use App\Models\SafetyMonitor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
@@ -83,3 +84,49 @@ Route::prefix('/v1/observingconditions/0')->group(function () {
     });
 });
 
+Route::prefix('/v1/safetymonitor/0')->group(function () {
+    Route::get('issafe', function () {
+        $safety = new SafetyMonitor();
+
+        dd($safety->isSafe());
+
+    });
+
+    /* common */
+    Route::put('/action', function (Request $request) {
+        return Response::json(['ErrorNumber' => 1036, 'ErrorMessage' => "Not implemented"]);
+    });
+    Route::put('/commandblind', function (Request $request) {
+        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+    });
+    Route::put('/commandbool', function (Request $request) {
+        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+    });
+    Route::put('/commandstring', function (Request $request) {
+        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+    });
+    Route::put('/connected', function (Request $request) {
+        return Response::json(['value' => 'true', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/connected', function (Request $request) {
+        return Response::json(['value' => 'true', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/description', function (Request $request) {
+        return Response::json(['value' => 'Ascom bridge for safety', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/driverinfo', function (Request $request) {
+        return Response::json(['value' => 'powered by Laravel', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/driverversion', function (Request $request) {
+        return Response::json(['value' => "1", 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/interfaceversion', function (Request $request) {
+        return Response::json(['value' => "1", 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/name', function (Request $request) {
+        return Response::json(['value' => 'TeslaAscomConnector', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    });
+    Route::get('/supportedactions', function (Request $request) {
+        return Response::json(['value' => '[]', 'ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+    });
+});
