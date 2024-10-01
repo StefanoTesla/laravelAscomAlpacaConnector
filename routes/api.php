@@ -87,9 +87,7 @@ Route::prefix('/v1/observingconditions/0')->group(function () {
 Route::prefix('/v1/safetymonitor/0')->group(function () {
     Route::get('issafe', function () {
         $safety = new SafetyMonitor();
-
-        dd($safety->isSafe());
-
+        return Response::json(['value' => $safety->isSafe(), 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     });
 
     /* common */
