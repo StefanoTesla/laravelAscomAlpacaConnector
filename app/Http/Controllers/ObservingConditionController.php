@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WeatherStation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Log;
+
 
 class ObservingConditionController extends Controller
 {
@@ -87,6 +87,5 @@ class ObservingConditionController extends Controller
 
         }
     }
-
 
 }

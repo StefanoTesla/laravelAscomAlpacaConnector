@@ -1,11 +1,16 @@
 <?php
 
-use App\Models\WeatherStation;
+use App\Services\Alpaca\ClientStatusService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
-
 Route::get('/', function () {
     return view('welcome');
+});
+
+
+Route::get('test/', function () {
+
+    return Response::json(ClientStatusService::list());
 });
 
 /*

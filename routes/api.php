@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\ObservingConditionController;
+use App\Http\Middleware\AscomAlpacaParameters;
 use App\Models\SafetyMonitor;
+use App\Services\Alpaca\ClientStatusService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 
 
 
-Route::prefix('/v1/observingconditions/0')->group(function () {
+Route::prefix('/v1/observingconditions/0')->middleware(AscomAlpacaParameters::class)->group(function () {
     Route::controller(ObservingConditionController::class)->group(function () {
         Route::get('avarageperiod', 'getAvaragePeriod');
         Route::put('avarageperiod', 'putAvaragePeriod');
@@ -25,21 +28,37 @@ Route::prefix('/v1/observingconditions/0')->group(function () {
     });
 
     Route::get('/cloudcover', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
 
     Route::put('/refresh', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
 
     Route::get('/skybrightness', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::get('/skyquality', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::get('/skytemperature', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::get('/starfwhm', function (Request $request) {
         return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
@@ -59,7 +78,17 @@ Route::prefix('/v1/observingconditions/0')->group(function () {
         return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
     });
     Route::put('/connected', function (Request $request) {
-        return Response::json(['value' => 'true', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+        $con = false;
+        if($request->ClientID){
+            if($request->Connected == 'True'){
+                ClientStatusService::connect($request->ClientID);
+                $con = true;
+            } else {
+                ClientStatusService::disconnect($request->ClientID);
+            }
+        }
+        Log::info([ClientStatusService::list(),$con,$request->Connected]);
+        return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     });
     Route::get('/connected', function (Request $request) {
         return Response::json(['value' => 'true', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
@@ -92,13 +121,22 @@ Route::prefix('/v1/safetymonitor/0')->group(function () {
 
     /* common */
     Route::put('/action', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1036, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1036,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::put('/commandblind', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::put('/commandbool', function (Request $request) {
-        return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Not implemented"
+        ]);
     });
     Route::put('/commandstring', function (Request $request) {
         return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
