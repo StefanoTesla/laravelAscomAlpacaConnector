@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 
 Route::get('test/', function () {
-
+    ClientStatusService::clean();
     return Response::json(ClientStatusService::list());
 });
 
