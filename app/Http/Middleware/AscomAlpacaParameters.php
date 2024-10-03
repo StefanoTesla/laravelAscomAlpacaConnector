@@ -20,8 +20,6 @@ class AscomAlpacaParameters
     {
         $response = $next($request);
 
-
-
         if ($response instanceof \Illuminate\Http\JsonResponse){
             $data = $response->getData(true);
 

@@ -2,26 +2,27 @@
 use App\Http\Middleware\ReadAlpacaParameters;
 use App\Http\Middleware\AscomAlpacaParameters;
 use App\Http\Controllers\ObservingConditionController;
-
-
-
 use App\Models\SafetyMonitor;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 
-
-
-Route::prefix('/v1/observingconditions/0')->middleware([ReadAlpacaParameters::class,AscomAlpacaParameters::class])->group(function () {
+Route::get('test', function(){
+    return Response::json(['hello' => 'word']);
+});
+Route::prefix('/v1/observingconditions/0')
+    ->middleware(
+        [ReadAlpacaParameters::class,
+        'client.connected:observing',
+        AscomAlpacaParameters::class])
+    ->group(function () {
     Route::controller(ObservingConditionController::class)->group(function () {
 
         //properties
         Route::get('avarageperiod', 'getAvaragePeriod');
-        Route::put('avarageperiod', 'putAvaragePeriod');
+        Route::put('avarageperiod', 'propertyNotImplemented');
         Route::get('cloudcover', 'propertyNotImplemented');
-        Route::put('connected', 'putConnectionState');
-        Route::get('connected', 'getConnectionState');
         Route::get('description', 'getDescription');
         Route::get('dewpoint', 'dewpoint');
         Route::get('driverinfo', 'driverInfo');
@@ -42,7 +43,7 @@ Route::prefix('/v1/observingconditions/0')->middleware([ReadAlpacaParameters::cl
         Route::get('windspeed','windSpeed');
 
         //methods
-        Route::put('action','methodNotImplemented');
+        Route::put('action','actionNotImplemented');
         Route::put('commandblind','methodNotImplemented');
         Route::put('commandbool','methodNotImplemented');
         Route::put('commandstring','methodNotImplemented');
@@ -52,9 +53,18 @@ Route::prefix('/v1/observingconditions/0')->middleware([ReadAlpacaParameters::cl
         
     });
 
-    /* common */
-
-
+});
+/* connection should be outside connection check middleware, the ->withNoMiddleware helper doesen't work */
+Route::prefix('/v1/observingconditions/0')
+    ->middleware(
+        [ReadAlpacaParameters::class,
+        AscomAlpacaParameters::class])
+    ->group(function () {
+    Route::controller(ObservingConditionController::class)->group(function () {
+        Route::put('connected', 'putConnectionState');
+        Route::get('connected', 'getConnectionState');
+        
+    });
 
 });
 

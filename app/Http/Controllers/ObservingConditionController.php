@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WeatherStation;
 use App\Services\Alpaca\ClientStatusService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
@@ -18,14 +18,13 @@ class ObservingConditionController extends Controller
     {
         $this->weatherStation = WeatherStation::find(1);
         $this->device = 'observing';
+        Session::put('device_type', $this->device);
+        Log::info(Session::all());
     }
     function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);
     }
 
-    function putAvaragePeriod(){
-            return Response::json(['ErrorNumber' =>1024 , 'ErrorMessages' => 'Action not implemented']);
-    }
     function temperature(){
             return Response::json(['Value' =>$this->weatherStation->temperature ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
     }
@@ -100,13 +99,21 @@ class ObservingConditionController extends Controller
             'ErrorMessage' => "Method Not Implemented"
         ]);
     }
+    function actionNotImplemented(){
+        return Response::json([
+            'ErrorNumber' => 1036,
+            'ErrorMessage' => "Action Not Implemented"
+        ]);
+    }
     function getConnectionState(){
-        $con = false;
         if(Session::get('clientid')){
-            ClientStatusService::state(Session::get('clientid'),$this->device);
-            $con = true;
+            if(ClientStatusService::state(Session::get('clientid'),$this->device)){
+                return Response::json(['value' => true, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+            } else {
+                return Response::json(['value' => false, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+            }
         }
-        return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+        return Response::json(['ErrorNumber' => 1025, 'ErrorMessage' => "ClientID was not provided"],400);
     }
     function putConnectionState(){
         $con = false;
