@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WeatherStation;
+use App\Services\Alpaca\ClientStatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
@@ -11,10 +12,12 @@ class ObservingConditionController extends Controller
 {
 
     protected $weatherStation;
+    protected $device;
 
     public function __construct()
     {
         $this->weatherStation = WeatherStation::find(1);
+        $this->device = 'observing';
     }
     function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);
@@ -22,31 +25,31 @@ class ObservingConditionController extends Controller
 
     function putAvaragePeriod(){
             return Response::json(['ErrorNumber' =>1024 , 'ErrorMessages' => 'Action not implemented']);
-        }
+    }
     function temperature(){
             return Response::json(['Value' =>$this->weatherStation->temperature ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function dewPoint(){
             return Response::json(['Value' =>$this->weatherStation->dewpoint ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function humidity(){
             return Response::json(['Value' =>$this->weatherStation->humidity, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function pressure(){
             return Response::json(['Value' =>$this->weatherStation->pressure, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function rainrate(){
             return Response::json(['Value' =>$this->weatherStation->rainrate, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function windSpeed(){
             return Response::json(['Value' =>$this->weatherStation->windspeed, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function windDirection(){
             return Response::json(['Value' =>$this->weatherStation->winddir, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function windGust(){
             return Response::json(['Value' =>$this->weatherStation->windgust, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
+    }
     function sensorDescription(){
         switch (Session::get('sensorname')) {
             case 'windspeed':
@@ -66,8 +69,7 @@ class ObservingConditionController extends Controller
                 break;
         }
     }
-
-    function lastUpdate(Request $request){
+    function lastUpdate(){
         switch (Session::get('sensorname')) {
             case 'windspeed':
             case 'windgust': 
@@ -85,6 +87,55 @@ class ObservingConditionController extends Controller
                 break;
 
         }
+    }
+    function propertyNotImplemented(){
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Property Not implemented"
+        ]);
+    }
+    function methodNotImplemented(){
+        return Response::json([
+            'ErrorNumber' => 1024,
+            'ErrorMessage' => "Method Not Implemented"
+        ]);
+    }
+    function getConnectionState(){
+        $con = false;
+        if(Session::get('clientid')){
+            ClientStatusService::state(Session::get('clientid'),$this->device);
+            $con = true;
+        }
+        return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+    function putConnectionState(){
+        $con = false;
+        if(Session::get('clientid')){
+            if(Session::get('connected') == true){
+                ClientStatusService::connect(Session::get('clientid'),'observing');
+                $con = true;
+            } else {
+                ClientStatusService::disconnect(Session::get('clientid'),'observing');
+            }
+        }
+        return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+
+    function getDescription(){
+        return Response::json(['value' => 'Ascom bridge for meteo and safety', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+
+    function driverInfo(){
+        return Response::json(['value' => 'powered by Laravel', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+    function driverVersion(){
+        return Response::json(['value' => '1.0.0', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+    function interfaceVersion(){
+        return Response::json(['value' => '1', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+    }
+    function name(){
+        return Response::json(['value' => 'TeslaAscomConnector', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
 
 }

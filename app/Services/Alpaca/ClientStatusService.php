@@ -36,6 +36,18 @@ class ClientStatusService{
         }
     }
 
+    static function state(int $clientID,string $device){
+        $client = AlpacaClient::where('client_id',$clientID)
+                                ->where('device_type',$device)
+                                ->first();
+        if(!is_null($client)){
+            return $client->connected;
+        }
+
+        return false;
+    }
+
+
     static function list(){
         return AlpacaClient::all()->groupBy('device_type');
     }
