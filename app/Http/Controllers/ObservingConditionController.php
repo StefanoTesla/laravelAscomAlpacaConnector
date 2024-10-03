@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WeatherStation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-
+use Illuminate\Support\Facades\Session;
 
 class ObservingConditionController extends Controller
 {
@@ -47,17 +47,17 @@ class ObservingConditionController extends Controller
     function windGust(){
             return Response::json(['Value' =>$this->weatherStation->windgust, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
         }
-    function sensorDescription(Request $request){
-        switch ($request->SensorName) {
-            case 'WindSpeed':
-            case 'WindGust': 
-            case 'WindDirection':
-            case 'RainRate':
-            case 'Pressure':
-            case 'Humidity':
-            case 'DewPoint':
-            case 'CloudCover':
-            case 'Temperature':
+    function sensorDescription(){
+        switch (Session::get('sensorname')) {
+            case 'windspeed':
+            case 'windgust': 
+            case 'winddirection':
+            case 'rainrate':
+            case 'pressure':
+            case 'humidity':
+            case 'dewpoint':
+            //case 'cloudcover':
+            case 'temperature':
                 return Response::json(['Value' => 'GW2000', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
                 break;
             
@@ -68,16 +68,15 @@ class ObservingConditionController extends Controller
     }
 
     function lastUpdate(Request $request){
-        switch ($request->SensorName) {
-            case 'WindSpeed':
-            case 'WindGust': 
-            case 'WindDirection':
-            case 'RainRate':
-            case 'Pressure':
-            case 'Humidity':
-            case 'DewPoint':
-            case 'CloudCover':
-            case 'Temperature':
+        switch (Session::get('sensorname')) {
+            case 'windspeed':
+            case 'windgust': 
+            case 'winddirection':
+            case 'rainrate':
+            case 'pressure':
+            case 'humidity':
+            case 'dewpoint':
+            case 'temperature':
                 return Response::json(['Value' => $this->weatherStation->updated_at->diffInSeconds(now()), 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
                 break;
             

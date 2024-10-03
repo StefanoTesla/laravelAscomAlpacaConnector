@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use App\Services\Alpaca\ServerTransitionService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 class AscomAlpacaParameters
@@ -18,34 +20,25 @@ class AscomAlpacaParameters
     {
         $response = $next($request);
 
-        if ($request->ClientID && is_numeric($request->ClientID)) {
-            $clientID= $request->ClientID;
-        }
 
-        
-        if ($request->ClientTransactionID && is_numeric($request->ClientTransactionID)){
-            $cliTransID = $request->ClientTransactionID;
-        }
 
-        if ($response instanceof \Illuminate\Http\JsonResponse && $clientID) {
+        if ($response instanceof \Illuminate\Http\JsonResponse){
             $data = $response->getData(true);
-            $data['clientID'] = $clientID;
-            $response->setData($data);
-        }
 
-        if ($response instanceof \Illuminate\Http\JsonResponse && $cliTransID) {
-            $data = $response->getData(true);
-            $data['ClientTransactionID'] = $cliTransID;
-            $response->setData($data);
-        }
+            if(Session::get('clientid')) {
+                $data['clientID'] = Session::get('clientid');
+            }
 
-        if ($response instanceof \Illuminate\Http\JsonResponse) {
-            $data = $response->getData(true);
+            if (Session::get('clienttransactionid')) {
+                $data['ClientTransactionID'] = Session::get('clienttransactionid');
+            }
+
             $serverTransition = ServerTransitionService::get();
             $data['ServerTransactionID'] = $serverTransition;
             $response->setData($data);
-        }        
 
+        }        
+        Log::info($response);
         return $response;
     }
 }

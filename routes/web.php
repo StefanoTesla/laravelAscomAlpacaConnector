@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\Alpaca\ClientStatusService;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 Route::get('/', function () {
@@ -9,8 +9,6 @@ Route::get('/', function () {
 
 
 Route::get('test/', function () {
-    ClientStatusService::clean();
-    return Response::json(ClientStatusService::list());
 });
 
 /*

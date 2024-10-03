@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ObservingConditionController;
 use App\Http\Middleware\AscomAlpacaParameters;
+use App\Http\Middleware\ReadAlpacaParameters;
 use App\Models\SafetyMonitor;
 use App\Services\Alpaca\ClientStatusService;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Response;
 
 
 
-Route::prefix('/v1/observingconditions/0')->middleware(AscomAlpacaParameters::class)->group(function () {
+Route::prefix('/v1/observingconditions/0')->middleware([ReadAlpacaParameters::class,AscomAlpacaParameters::class])->group(function () {
     Route::controller(ObservingConditionController::class)->group(function () {
         Route::get('avarageperiod', 'getAvaragePeriod');
         Route::put('avarageperiod', 'putAvaragePeriod');
@@ -81,13 +82,12 @@ Route::prefix('/v1/observingconditions/0')->middleware(AscomAlpacaParameters::cl
         $con = false;
         if($request->ClientID){
             if($request->Connected == 'True'){
-                ClientStatusService::connect($request->ClientID);
+                ClientStatusService::connect($request->ClientID,'observing');
                 $con = true;
             } else {
-                ClientStatusService::disconnect($request->ClientID);
+                ClientStatusService::disconnect($request->ClientID,'observing');
             }
         }
-        Log::info([ClientStatusService::list(),$con,$request->Connected]);
         return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     });
     Route::get('/connected', function (Request $request) {
