@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\WeatherStation;
 use App\Services\Alpaca\ClientStatusService;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
@@ -18,8 +17,6 @@ class ObservingConditionController extends Controller
     {
         $this->weatherStation = WeatherStation::find(1);
         $this->device = 'observing';
-        Session::put('device_type', $this->device);
-        Log::info(Session::all());
     }
     function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);
@@ -124,14 +121,14 @@ class ObservingConditionController extends Controller
             } else {
                 ClientStatusService::disconnect(Session::get('clientid'),'observing');
             }
+            return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+        } else {
+            return Response::json(['ErrorNumber' => 1025, 'ErrorMessage' => "Client ID was not provided"]);
         }
-        return Response::json(['value' => $con, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-
     function getDescription(){
         return Response::json(['value' => 'Ascom bridge for meteo and safety', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-
     function driverInfo(){
         return Response::json(['value' => 'powered by Laravel', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }

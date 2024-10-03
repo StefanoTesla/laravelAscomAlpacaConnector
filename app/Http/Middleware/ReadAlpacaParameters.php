@@ -17,13 +17,11 @@ class ReadAlpacaParameters
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        // Ottieni i parametri della query
-        $queryParams = $request->query();
     
-        // Ottieni il corpo della richiesta
+        // Get Parameters
         $bodyParams = $request->all();
 
+        Log::info($request->all());
         if(count($bodyParams) > 0){
             foreach($bodyParams as $key => $parameter){
                 Log::info($key ." valore:". $parameter);
