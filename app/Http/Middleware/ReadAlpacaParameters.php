@@ -21,7 +21,6 @@ class ReadAlpacaParameters
         // Get Parameters
         $bodyParams = $request->all();
 
-        Log::info($request->all());
         if(count($bodyParams) > 0){
             foreach($bodyParams as $key => $parameter){
                 Log::info($key ." valore:". $parameter);

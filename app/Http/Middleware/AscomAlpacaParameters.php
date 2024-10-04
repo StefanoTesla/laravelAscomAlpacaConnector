@@ -36,8 +36,6 @@ class AscomAlpacaParameters
             $response->setData($data);
 
         }
-        Log::info($request->url());    
-        Log::info($response);
         return $response;
     }
 }
