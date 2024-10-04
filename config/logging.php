@@ -131,6 +131,14 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/weather_sation.log'),
             'level' => 'debug',
+            'days' => 5
+        ],
+
+        'alpaca_comunication' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/alpaca_comunication.log'),
+            'level' => 'debug',
+            'days' => 1
         ],
 
     ],
