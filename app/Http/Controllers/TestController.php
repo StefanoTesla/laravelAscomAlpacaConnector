@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Http\Controllers;
 
 use App\Models\WeatherData\DewPoint;
 use App\Models\WeatherData\Humidity;
@@ -9,37 +9,21 @@ use App\Models\WeatherData\RainRate;
 use App\Models\WeatherData\Temperature;
 use App\Models\WeatherData\Wind;
 use App\Models\WeatherData\WindGust;
-use App\Models\WeatherStation;
 use App\Services\WeatherData\AscomSender;
 use App\Services\WeatherStations\Gw2000Service;
+//use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
-class getDataFromWeatherStation extends Command
+class TestController extends Controller
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'getdata:fromweatherstation';
+    public function test(){
+        
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Read the data from the weather Station';
-
-    /**
-     * Execute the console command.
-     */
-    public function handle()
-    {
         Log::channel('weather_station')->info("--- START DATA ACQUISITION ---");
         $service = new Gw2000Service();
 
@@ -66,7 +50,8 @@ class getDataFromWeatherStation extends Command
                     Log::channel('weather_station')->alert("Errore nel campo '$key': $message");
                 }
             }
-            $this->fail('Error during data validation.');
+            //$this->fail('Error during data validation.');
+            dd("errore di validazione");
         }
 
         $validated = $validator->validated();
@@ -116,53 +101,69 @@ class getDataFromWeatherStation extends Command
             'sync' => false
         ]);
 
+
         $ascomData = [
             'dewpoint' => [
-                'value' => $validated['dew_point'],
-                'sync' => $now,
-                'desc' => DewPoint::getDescription()
+               'value' => $validated['dew_point'],
+               'sync' => $now,
+               'desc' => Temperature::getDescription()
+               ],
+            'humidity' => [
+               'value' => $validated['outdoor_humidity'],
+               'sync' => $now,
+               'desc' => Humidity::getDescription()
+               ],
+            'pressure' => [
+               'value' => $validated['absolute_pressure'],
+               'sync' => $now,
+               'desc' => Pressure::getDescription()
+               ],
+            'rainrate' => [
+               'value' => $validated['rain_rate'],
+               'sync' => $now,
+               'desc' => RainRate::getDescription()
+               ],
+            'temperature' => [
+               'value' => $validated['outdoor_temperature'],
+               'sync' => $now,
+               'desc' => Temperature::getDescription()
+               ],
+            'winddirection' => [
+               'value' => $validated['wind_direction'],
+               'sync' => $now,
+               'desc' => Wind::getDescription()
+               ],
+            'windgust' => [
+               'value' => $validated['gust_speed'],
+               'sync' => $now,
+               'desc' => WindGust::getDescription()
+               ],
+            'windspeed' => [
+                   'value' => $validated['wind_speed'],
+                    'sync' => $now,
+                    'desc' => Wind::getDescription()
                 ],
-             'humidity' => [
-                'value' => $validated['outdoor_humidity'],
-                'sync' => $now,
-                'desc' => Humidity::getDescription()
-                ],
-             'pressure' => [
-                'value' => $validated['absolute_pressure'],
-                'sync' => $now,
-                'desc' => Pressure::getDescription()
-                ],
-             'rainrate' => [
-                'value' => $validated['rain_rate'],
-                'sync' => $now,
-                'desc' => RainRate::getDescription()
-                ],
-             'temperature' => [
-                'value' => $validated['outdoor_temperature'],
-                'sync' => $now,
-                'desc' => Temperature::getDescription()
-                ],
-             'winddirection' => [
-                'value' => $validated['wind_direction'],
-                'sync' => $now,
-                'desc' => Wind::getDescription()
-                ],
-             'windgust' => [
-                'value' => $validated['gust_speed'],
-                'sync' => $now,
-                'desc' => WindGust::getDescription()
-                ],
-             'windspeed' => [
-                    'value' => $validated['wind_speed'],
-                     'sync' => $now,
-                     'desc' => Wind::getDescription()
-                 ],
         ];
 
         AscomSender::refreshCache($ascomData);
+        dd(AscomSender::getData());
 
         Log::channel('weather_station')->info("--- Weather Station Data Acquisition finish ---");
-    }     
-        
-}
+    
+    }
 
+    public function prova(Request $request){
+        $a = AscomSender::getData();
+        if(isset($a['cloudcover'])){
+            Log::info('"isset');
+            return Response::json(['Value' =>$a['cloudcover']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        $this->propertyNotImplemented();
+
+    }
+
+    public function propertyNotImplemented(){
+        Log::info('property');
+        return Response::json(['Value' =>1024 ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    }
+}

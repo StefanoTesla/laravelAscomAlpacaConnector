@@ -1,6 +1,8 @@
 <?php
 
-
+use App\Http\Controllers\TestController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response;
 Route::get('/', function () {
@@ -8,8 +10,7 @@ Route::get('/', function () {
 });
 
 
-Route::get('test/', function () {
-});
+Route::get('/test', [TestController::class, 'prova']);
 
 /*
 Route::get('/crea', function () {

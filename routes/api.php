@@ -1,6 +1,6 @@
 <?php
-use App\Http\Middleware\ReadAlpacaParameters;
-use App\Http\Middleware\AscomAlpacaParameters;
+use App\Http\Middleware\Alpaca\ReadAlpacaParameters;
+use App\Http\Middleware\Alpaca\WriteAlpacaParameters;
 use App\Http\Controllers\ObservingConditionController;
 use App\Http\Controllers\SafetyMonitorController;
 use Illuminate\Http\Request;
@@ -15,14 +15,15 @@ Route::prefix('/v1/observingconditions/0')
     ->middleware(
         [ReadAlpacaParameters::class,
         'client.connected:observing',
-        AscomAlpacaParameters::class])
+        WriteAlpacaParameters::class])
     ->group(function () {
     Route::controller(ObservingConditionController::class)->group(function () {
 
         //properties
         Route::get('avarageperiod', 'getAvaragePeriod');
         Route::put('avarageperiod', 'propertyNotImplemented');
-        Route::get('cloudcover', 'propertyNotImplemented');
+
+        Route::get('cloudcover', 'cloudcover');
         Route::get('description', 'getDescription');
         Route::get('dewpoint', 'dewpoint');
         Route::get('driverinfo', 'driverInfo');
@@ -32,10 +33,10 @@ Route::prefix('/v1/observingconditions/0')
         Route::get('name', 'name');
         Route::get('pressure', 'pressure');
         Route::get('rainrate', 'rainrate');
-        Route::get('skybrightness', 'propertyNotImplemented');
-        Route::get('skyquality', 'propertyNotImplemented');
-        Route::get('skytemperature', 'propertyNotImplemented');
-        Route::get('starfwhm','propertyNotImplemented');
+        Route::get('skybrightness', 'skybrightness');
+        Route::get('skyquality', 'skyquality');
+        Route::get('skytemperature', 'skytemperature');
+        Route::get('starfwhm','starfwhm');
         Route::get('supportedactions','propertyNotImplemented');
         Route::get('temperature', 'temperature');
         Route::get('winddirection', 'windDirection');
@@ -58,7 +59,7 @@ Route::prefix('/v1/observingconditions/0')
 Route::prefix('/v1/observingconditions/0')
     ->middleware(
         [ReadAlpacaParameters::class,
-        AscomAlpacaParameters::class])
+        WriteAlpacaParameters::class])
     ->group(function () {
     Route::controller(ObservingConditionController::class)->group(function () {
         Route::put('connected', 'putConnectionState');
@@ -73,7 +74,7 @@ Route::prefix('/v1/safetymonitor/0')
     ->middleware(
         [ReadAlpacaParameters::class,
         'client.connected:safety',
-        AscomAlpacaParameters::class])
+        WriteAlpacaParameters::class])
     ->group(function () {
     Route::controller(SafetyMonitorController::class)->group(function () {
 
@@ -98,7 +99,7 @@ Route::prefix('/v1/safetymonitor/0')
 Route::prefix('/v1/safetymonitor/0')
     ->middleware(
         [ReadAlpacaParameters::class,
-        AscomAlpacaParameters::class])
+        WriteAlpacaParameters::class])
     ->group(function () {
     Route::controller(SafetyMonitorController::class)->group(function () {
         Route::put('connected', 'putConnectionState');

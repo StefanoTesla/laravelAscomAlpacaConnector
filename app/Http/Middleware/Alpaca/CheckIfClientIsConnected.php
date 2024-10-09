@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware\Alpaca;
 
 use App\Services\Alpaca\ClientStatusService;
 use Closure;

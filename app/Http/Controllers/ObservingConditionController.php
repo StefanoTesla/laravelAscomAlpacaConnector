@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WeatherStation;
 use App\Services\Alpaca\ClientStatusService;
+use App\Services\WeatherData\AscomSender;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
@@ -12,97 +12,130 @@ class ObservingConditionController extends Controller
 
     protected $weatherStation;
     protected $device;
+    protected $data;
 
     public function __construct()
     {
-        $this->weatherStation = WeatherStation::find(1);
         $this->device = 'observing';
+        $this->data = AscomSender::getData();
     }
-    function getAvaragePeriod(){
+    public function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);
     }
 
-    function temperature(){
-            return Response::json(['Value' =>$this->weatherStation->temperature ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function cloudcover(){
+        if(isset($this->data['cloudcover'])){
+            return Response::json(['Value' =>$this->data['cloudcover']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();
     }
-    function dewPoint(){
-            return Response::json(['Value' =>$this->weatherStation->dewpoint ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function dewPoint(){
+        if(isset($this->data['dewpoint'])){
+            return Response::json(['Value' =>$this->data['dewpoint']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented();
     }
-    function humidity(){
-            return Response::json(['Value' =>$this->weatherStation->humidity, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function humidity(){
+        if(isset($this->data['humidity'])){
+            return Response::json(['Value' =>$this->data['humidity']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented();
     }
-    function pressure(){
-            return Response::json(['Value' =>$this->weatherStation->pressure, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function pressure(){
+        if(isset($this->data['pressure'])){
+            return Response::json(['Value' =>$this->data['pressure']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();
     }
-    function rainrate(){
-            return Response::json(['Value' =>$this->weatherStation->rainrate, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function rainrate(){
+        if(isset($this->data['rainrate'])){
+            return Response::json(['Value' =>$this->data['rainrate']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();
     }
-    function windSpeed(){
-            return Response::json(['Value' =>$this->weatherStation->windspeed, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function skybrightness(){
+        if(isset($this->data['skybrightness'])){
+            return Response::json(['Value' =>$this->data['skybrightness']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();       
     }
-    function windDirection(){
-            return Response::json(['Value' =>$this->weatherStation->winddir, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function skyquality(){
+        if(isset($this->data['skyquality'])){
+            return Response::json(['Value' =>$this->data['skyquality']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();    
     }
-    function windGust(){
-            return Response::json(['Value' =>$this->weatherStation->windgust, 'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function skytemperature(){
+        if(isset($this->data['skytemperature'])){
+            return Response::json(['Value' =>$this->data['skytemperature']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented();    
     }
-    function sensorDescription(){
-        switch (Session::get('sensorname')) {
-            case 'windspeed':
-            case 'windgust': 
-            case 'winddirection':
-            case 'rainrate':
-            case 'pressure':
-            case 'humidity':
-            case 'dewpoint':
-            //case 'cloudcover':
-            case 'temperature':
-                return Response::json(['Value' => 'GW2000', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
-                break;
-            
-            default:
-                return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
-                break;
+    public function starfwhm(){
+        if(isset($this->data['starfwhm'])){
+            return Response::json(['Value' =>$this->data['starfwhm']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented();      
+    }
+    public function temperature(){
+        if(isset($this->data['temperature'])){
+            return Response::json(['Value' =>$this->data['temperature']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented();
+    }
+    public function windDirection(){
+        if(isset($this->data['winddirection'])){
+            return Response::json(['Value' =>$this->data['winddirection']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented(); 
+    }
+    public function windGust(){
+        if(isset($this->data['windgust'])){
+            return Response::json(['Value' =>$this->data['windgust']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        }
+        return $this->propertyNotImplemented(); 
+    }
+    public function windSpeed(){
+        if(isset($this->data['windspeed'])){
+            return Response::json(['Value' =>$this->data['windspeed']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+        } 
+        return $this->propertyNotImplemented(); 
+    }
+    public function sensorDescription(){
+        $sensorName = Session::get('sensorname');
+        if( isset($this->data[$sensorName]['desc']) ){
+            return Response::json(['Value' => $this->data[$sensorName]['desc'], 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+        } else {
+            return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
         }
     }
-    function lastUpdate(){
-        switch (Session::get('sensorname')) {
-            case 'windspeed':
-            case 'windgust': 
-            case 'winddirection':
-            case 'rainrate':
-            case 'pressure':
-            case 'humidity':
-            case 'dewpoint':
-            case 'temperature':
-                return Response::json(['Value' => $this->weatherStation->updated_at->diffInSeconds(now()), 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
-                break;
-            
-            default:
-                return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
-                break;
-
-        }
+    public function lastUpdate(){
+        $sensorName = Session::get('sensorname');
+        if( isset($this->data[$sensorName]['sync']) ){
+            return Response::json(['Value' => $this->data[$sensorName]['sync']->diffInSeconds(now()), 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
+        } else {
+            return Response::json(['ErrorNumber' => 1024, 'ErrorMessage' => "Not implemented"]);
+        }        
     }
-    function propertyNotImplemented(){
+    public function propertyNotImplemented(){
         return Response::json([
             'ErrorNumber' => 1024,
             'ErrorMessage' => "Property Not implemented"
         ]);
     }
-    function methodNotImplemented(){
+    public function methodNotImplemented(){
         return Response::json([
             'ErrorNumber' => 1024,
             'ErrorMessage' => "Method Not Implemented"
         ]);
     }
-    function actionNotImplemented(){
+    public function actionNotImplemented(){
         return Response::json([
             'ErrorNumber' => 1036,
             'ErrorMessage' => "Action Not Implemented"
         ]);
     }
-    function getConnectionState(){
+    public function getConnectionState(){
         if(Session::get('clientid')){
             if(ClientStatusService::state(Session::get('clientid'),$this->device)){
                 return Response::json(['value' => true, 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
@@ -112,7 +145,7 @@ class ObservingConditionController extends Controller
         }
         return Response::json(['ErrorNumber' => 1025, 'ErrorMessage' => "ClientID was not provided"],400);
     }
-    function putConnectionState(){
+    public function putConnectionState(){
         $con = false;
         if(Session::get('clientid')){
             if(Session::get('connected') == true){
@@ -126,19 +159,19 @@ class ObservingConditionController extends Controller
             return Response::json(['ErrorNumber' => 1025, 'ErrorMessage' => "Client ID was not provided"]);
         }
     }
-    function getDescription(){
+    public function getDescription(){
         return Response::json(['value' => 'Ascom bridge for meteo and safety', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-    function driverInfo(){
+    public function driverInfo(){
         return Response::json(['value' => 'powered by Laravel', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-    function driverVersion(){
+    public function driverVersion(){
         return Response::json(['value' => '1.0.0', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-    function interfaceVersion(){
+    public function interfaceVersion(){
         return Response::json(['value' => '1', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
-    function name(){
+    public function name(){
         return Response::json(['value' => 'TeslaAscomConnector', 'ErrorNumber' => 0, 'ErrorMessage' => ""]);
     }
 
