@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\WeatherData\RainRate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\WeatherStation;
@@ -12,9 +12,15 @@ class SafetyMonitor extends Model
 
     public function isSafe(){
 
-        $weather = WeatherStation::find(1);
+        $weather = RainRate::where('ack_time', '>', now()->subMinutes(30))
+        ->where('value', '<>', 0)
+        ->get();
 
-        return $weather->rainrate ? false : true;
+        if(count($weather) == 0) {
+            return true;
+        }
+
+        return false;
 
     }
 }

@@ -10,7 +10,7 @@ Route::get('/', function () {
 });
 
 
-Route::get('/test', [TestController::class, 'prova']);
+Route::get('/test', [TestController::class, 'test']);
 
 /*
 Route::get('/crea', function () {
