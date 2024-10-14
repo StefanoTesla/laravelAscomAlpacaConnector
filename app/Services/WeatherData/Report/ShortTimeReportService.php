@@ -127,42 +127,42 @@ class ShortTimeReportService{
 
     private function getAvgTemperature(){
         $temp = Temperature::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-        if($temp){
+        if(!is_null($temp)){
             return round($temp, 2);
         }
         return null;
     }
     private function getAvgDewPoint(){
         $temp = DewPoint::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-        if($temp){
+        if(!is_null($temp)){
             return round($temp, 2);
         }
         return null;
     }
     private function getAvgHumidity(){
         $temp = Humidity::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-        if($temp){
+        if(!is_null($temp)){
             return intval($temp);
         }
         return null;
     }
     private function getAvgPressure(){
         $temp = Pressure::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-        if($temp){
+        if(!is_null($temp)){
             return round($temp, 2);
         }
         return null;
     }
     private function getMaxGustSpeed(){
         $temp = WindGust::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
-        if($temp){
+        if(!is_null($temp)){
             return round($temp, 2);
         }
         return null;
     }
     private function getMaxRainRate(){
         $temp = RainRate::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
-        if($temp){
+        if(!is_null($temp)){
             return round($temp, 2);
         }
         return null;
