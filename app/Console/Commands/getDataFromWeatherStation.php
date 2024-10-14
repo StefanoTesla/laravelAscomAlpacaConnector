@@ -41,7 +41,7 @@ class getDataFromWeatherStation extends Command
         $service = new Gw2000Service();
         $start = microtime(true);
         $gw2000 = $service->getLiveData();
-        $finish = $start - microtime(true);
+        $finish = microtime(true) - $start;
         Log::channel('weather_station')->info("Data ack in ".$finish." s");
 
         $validator = Validator::make($gw2000,

@@ -1,13 +1,10 @@
 <?php
 
 namespace App\Models\WeatherData;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Pressure extends Model
 {
-    use HasFactory;
     public $timestamps = false;
     protected $fillable = ['value','ack_time','sync'];
     protected $casts = [
