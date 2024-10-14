@@ -158,10 +158,58 @@ class getDataFromWeatherStation extends Command
                      'desc' => Wind::getDescription()
                  ],
         ];
-
-        AscomSender::refreshCache($ascomData);
-
         Log::channel('weather_station')->info("--- Weather Station Data Acquisition finish ---");
+        $ascomData = [
+            'dewpoint' => [
+                'value' => $validated['dew_point'],
+                'sync' => $now,
+                'desc' => DewPoint::getDescription()
+                ],
+             'humidity' => [
+                'value' => $validated['outdoor_humidity'],
+                'sync' => $now,
+                'desc' => Humidity::getDescription()
+                ],
+             'pressure' => [
+                'value' => $validated['absolute_pressure'],
+                'sync' => $now,
+                'desc' => Pressure::getDescription()
+                ],
+             'rainrate' => [
+                'value' => $validated['rain_rate'],
+                'sync' => $now,
+                'desc' => RainRate::getDescription()
+                ],
+             'temperature' => [
+                'value' => $validated['outdoor_temperature'],
+                'sync' => $now,
+                'desc' => Temperature::getDescription()
+                ],
+             'winddirection' => [
+                'value' => $validated['wind_direction'],
+                'sync' => $now,
+                'desc' => Wind::getDescription()
+                ],
+             'windgust' => [
+                'value' => $validated['gust_speed'],
+                'sync' => $now,
+                'desc' => WindGust::getDescription()
+                ],
+             'windspeed' => [
+                    'value' => $validated['wind_speed'],
+                     'sync' => $now,
+                     'desc' => Wind::getDescription()
+                 ],
+        ];
+        Log::channel('weather_station')->info("--- Refreshing Ascom Cache ---");
+        try {
+            AscomSender::refreshCache($ascomData);
+        } catch (Exception $th) {
+            Log::channel('weather_station')->error($th);
+        }
+        
+
+        Log::channel('weather_station')->info("--- Refreshing Ascom Cache finish ---");
     }     
         
 }
