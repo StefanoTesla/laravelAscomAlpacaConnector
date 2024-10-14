@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Alpaca;
+namespace App\Services\Ascom;
 
 use Illuminate\Support\Facades\Cache;
 

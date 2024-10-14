@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Alpaca;
+namespace App\Services\Ascom;
 
-use App\Models\AlpacaClient;
+use App\Models\Ascom\AlpacaClient;
 use Illuminate\Support\Carbon;
 
 class ClientStatusService{

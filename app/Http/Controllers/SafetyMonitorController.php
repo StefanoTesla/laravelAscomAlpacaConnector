@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SafetyMonitor;
-use App\Services\Alpaca\ClientStatusService;
+use App\Models\Ascom\SafetyMonitor;
+use App\Services\Ascom\ClientStatusService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 

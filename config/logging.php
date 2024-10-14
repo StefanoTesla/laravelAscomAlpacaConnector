@@ -141,6 +141,13 @@ return [
             'days' => 1
         ],
 
+        'weather_short_report' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/reports/short_report.log'),
+            'level' => 'debug',
+            'days' => 1
+        ],
+
     ],
 
 ];

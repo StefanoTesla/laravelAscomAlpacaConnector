@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\WeatherData;
+namespace App\Models\WeatherData\SingleMeasure;
 use Illuminate\Database\Eloquent\Model;
 
 class Wind extends Model

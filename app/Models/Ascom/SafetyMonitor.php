@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Models;
-use App\Models\WeatherData\RainRate;
+namespace App\Models\Ascom;
+use App\Models\WeatherData\SingleMeasure\RainRate;
 use Illuminate\Database\Eloquent\Model;
 
 class SafetyMonitor extends Model

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models\WeatherData;
+namespace App\Models\WeatherData\SingleMeasure;
 use Illuminate\Database\Eloquent\Model;
 
-class WindGust extends Model
+class Humidity extends Model
 {
     public $timestamps = false;
     protected $fillable = ['value','ack_time','sync'];

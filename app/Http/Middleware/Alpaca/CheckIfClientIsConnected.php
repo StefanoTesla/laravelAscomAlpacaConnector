@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware\Alpaca;
 
-use App\Services\Alpaca\ClientStatusService;
+use App\Services\Ascom\ClientStatusService;
 use Closure;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;

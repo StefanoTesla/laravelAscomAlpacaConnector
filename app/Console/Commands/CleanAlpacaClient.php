@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Alpaca\ClientStatusService;
+use App\Services\Ascom\ClientStatusService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +20,7 @@ class CleanAlpacaClient extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Clean alpaca client offline since one hour';
 
     /**
      * Execute the console command.

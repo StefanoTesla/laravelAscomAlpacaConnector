@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Alpaca\ClientStatusService;
-use App\Services\WeatherData\AscomSender;
+use App\Services\Ascom\ClientStatusService;
+use App\Services\Ascom\AscomObservingCache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ObservingConditionController extends Controller
 {
@@ -19,7 +18,7 @@ class ObservingConditionController extends Controller
     public function __construct()
     {
         $this->device = 'observing';
-        $this->data = AscomSender::getData();
+        $this->data = AscomObservingCache::getData();
     }
     public function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);

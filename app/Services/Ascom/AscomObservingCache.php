@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services\WeatherData;
+namespace App\Services\Ascom;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
-class AscomSender{
+class AscomObservingCache{
 
     static function refreshCache(array $newWheaterData){
 

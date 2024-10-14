@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware\Alpaca;
 
-use App\Services\Alpaca\ServerTransitionService;
+use App\Services\Ascom\ServerTransitionService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;

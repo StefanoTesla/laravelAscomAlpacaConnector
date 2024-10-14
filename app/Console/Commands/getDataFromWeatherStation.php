@@ -2,21 +2,21 @@
 
 namespace App\Console\Commands;
 
-use App\Models\WeatherData\DewPoint;
-use App\Models\WeatherData\Humidity;
-use App\Models\WeatherData\Pressure;
-use App\Models\WeatherData\RainRate;
-use App\Models\WeatherData\Temperature;
-use App\Models\WeatherData\Wind;
-use App\Models\WeatherData\WindGust;
-use App\Services\WeatherData\AscomSender;
+use App\Models\WeatherData\SingleMeasure\DewPoint;
+use App\Models\WeatherData\SingleMeasure\Humidity;
+use App\Models\WeatherData\SingleMeasure\Pressure;
+use App\Models\WeatherData\SingleMeasure\RainRate;
+use App\Models\WeatherData\SingleMeasure\Temperature;
+use App\Models\WeatherData\SingleMeasure\Wind;
+use App\Models\WeatherData\SingleMeasure\WindGust;
+use App\Services\Ascom\AscomObservingCache;
 use App\Services\WeatherStations\Gw2000Service;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class getDataFromWeatherStation extends Command
+class GetDataFromWeatherStation extends Command
 {
     /**
      * The name and signature of the console command.
@@ -202,7 +202,7 @@ class getDataFromWeatherStation extends Command
         ];
         Log::channel('weather_station')->info("--- Refreshing Ascom Cache ---");
         try {
-            AscomSender::refreshCache($ascomData);
+            AscomObservingCache::refreshCache($ascomData);
         } catch (Exception $th) {
             Log::channel('weather_station')->error($th);
         }
