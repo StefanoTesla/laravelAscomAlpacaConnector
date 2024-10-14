@@ -111,13 +111,12 @@ class ShortTimeReportService{
             ->first();
 
         foreach($array as $datatime){
-            if(!is_null($datatime) && ($datatime < $selected)){
+            if($selected == null){
+                $selected = $datatime;
+            } elseif(!is_null($datatime) && ($datatime < $selected)){
                     $selected = $datatime;
                 }
             }
-        if(is_null($selected)){
-            return now();
-        }
 
         $minutes = intval($selected->format('i')); 
         $roundedMinutes = floor($minutes / 5) * 5;
