@@ -53,7 +53,7 @@ class ClientStatusService{
     }
 
     static function clean(){
-        AlpacaClient::where('updated_at', '<', Carbon::now()->subDay())->delete();
+        return AlpacaClient::where('updated_at', '<', Carbon::now()->subDay())->delete();
     }
 
 

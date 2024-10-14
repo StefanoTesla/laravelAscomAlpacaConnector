@@ -6,6 +6,8 @@ use App\Services\Alpaca\ClientStatusService;
 use App\Services\WeatherData\AscomSender;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ObservingConditionController extends Controller
 {
@@ -22,84 +24,13 @@ class ObservingConditionController extends Controller
     public function getAvaragePeriod(){
         return Response::json(['value' => '0.0','ErrorNumber' => 0, 'ErrorMessages' => '']);
     }
-
-    public function cloudcover(){
-        if(isset($this->data['cloudcover'])){
-            return Response::json(['Value' =>$this->data['cloudcover']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
+    public function getMeasure(Request $request){
+        $measure = last(request()->segments());
+        Log::info($measure);
+        if(isset($this->data[$measure])){
+            return Response::json(['Value' =>$this->data[$measure]['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
         }
         return $this->propertyNotImplemented();
-    }
-    public function dewPoint(){
-        if(isset($this->data['dewpoint'])){
-            return Response::json(['Value' =>$this->data['dewpoint']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented();
-    }
-    public function humidity(){
-        if(isset($this->data['humidity'])){
-            return Response::json(['Value' =>$this->data['humidity']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented();
-    }
-    public function pressure(){
-        if(isset($this->data['pressure'])){
-            return Response::json(['Value' =>$this->data['pressure']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented();
-    }
-    public function rainrate(){
-        if(isset($this->data['rainrate'])){
-            return Response::json(['Value' =>$this->data['rainrate']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented();
-    }
-    public function skybrightness(){
-        if(isset($this->data['skybrightness'])){
-            return Response::json(['Value' =>$this->data['skybrightness']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented();       
-    }
-    public function skyquality(){
-        if(isset($this->data['skyquality'])){
-            return Response::json(['Value' =>$this->data['skyquality']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented();    
-    }
-    public function skytemperature(){
-        if(isset($this->data['skytemperature'])){
-            return Response::json(['Value' =>$this->data['skytemperature']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented();    
-    }
-    public function starfwhm(){
-        if(isset($this->data['starfwhm'])){
-            return Response::json(['Value' =>$this->data['starfwhm']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented();      
-    }
-    public function temperature(){
-        if(isset($this->data['temperature'])){
-            return Response::json(['Value' =>$this->data['temperature']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented();
-    }
-    public function windDirection(){
-        if(isset($this->data['winddirection'])){
-            return Response::json(['Value' =>$this->data['winddirection']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented(); 
-    }
-    public function windGust(){
-        if(isset($this->data['windgust'])){
-            return Response::json(['Value' =>$this->data['windgust']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        }
-        return $this->propertyNotImplemented(); 
-    }
-    public function windSpeed(){
-        if(isset($this->data['windspeed'])){
-            return Response::json(['Value' =>$this->data['windspeed']['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
-        } 
-        return $this->propertyNotImplemented(); 
     }
     public function sensorDescription(){
         $sensorName = Session::get('sensorname');

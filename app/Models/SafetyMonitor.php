@@ -4,7 +4,6 @@ namespace App\Models;
 use App\Models\WeatherData\RainRate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\WeatherStation;
 
 class SafetyMonitor extends Model
 {
@@ -12,11 +11,27 @@ class SafetyMonitor extends Model
 
     public function isSafe(){
 
-        $weather = RainRate::where('ack_time', '>', now()->subMinutes(30))
-        ->where('value', '<>', 0)
-        ->get();
+        $conditions =[
+            'dataFromGW200Available' => false,
+            'gotRainInTheLatestPeriod' => false
+        ];
 
-        if(count($weather) == 0) {
+        $RainData = RainRate::where('ack_time', '>', now()->subMinutes(30))->get();
+        
+        if($RainData->count()){
+            $conditions['dataFromGW200Available'] = true;
+        }
+
+        $rain = $RainData->sum('value');
+
+        if($rain == 0){
+            $conditions['gotRainInTheLatestPeriod'] = true;
+        }
+
+        if(
+            $conditions['dataFromGW200Available'] &&
+            $conditions['gotRainInTheLatestPeriod']
+        ){
             return true;
         }
 

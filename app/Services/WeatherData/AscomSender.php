@@ -3,12 +3,69 @@
 namespace App\Services\WeatherData;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class AscomSender{
 
-    static function refreshCache(array $data){
+    static function refreshCache(array $newWheaterData){
 
-    Cache::forever('ascom.weatherdata', $data);
+    $cache = Cache::get('ascom.weatherdata');
+
+    $struct = [
+        'cloudcover' => null,
+        'dewpoint' => null,
+        'humidity' => null,
+        'pressure' => null,
+        'rainrate' => null,
+        'skybrightness' => null,
+        'skyquality' => null,
+        'skytemperature' => null,
+        'starfwhm' => null,
+        'temperature' => null,
+        'winddirection' => null,
+        'windgust' => null,
+        'windspeed' => null,
+    ];
+
+    foreach($cache as $measure => $data){
+        if(isset($data['sync'])){
+            if(($data['sync'] < now()->subMinutes(10))){
+                unset($cache[$measure]);
+            }
+        } else {
+            unset($cache[$measure]);
+        }
+
+    }
+
+    
+
+    //check if incoming data are fresh and store them
+    foreach($newWheaterData as $measure => $value){
+        if($value['sync'] > now()->subMinutes(1)){
+            if(isset($cache[$measure]['sync'])){
+                if($value['sync'] > $cache[$measure]['sync']){
+                    $cache[$measure] = $value;
+                }
+            } else {
+                $cache[$measure] = $value;
+            }
+        } else {
+            unset($cache[$measure]);
+        }
+    }
+
+
+    //create a new cache object
+    foreach($struct as $measure => $values){
+        if(isset($cache[$measure])){
+            $struct[$measure] = $cache[$measure];
+        }
+    }
+
+    Cache::forever('ascom.weatherdata', $struct);
+
+    dd($struct);
     }
 
     static function getData(){
@@ -19,6 +76,14 @@ class AscomSender{
             return null;
         }
         
+    }
+
+
+
+    private function cleanCache($cache){
+
+
+        return $cache;
     }
 
 }

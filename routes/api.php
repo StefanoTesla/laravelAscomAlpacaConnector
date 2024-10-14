@@ -23,25 +23,25 @@ Route::prefix('/v1/observingconditions/0')
         Route::get('avarageperiod', 'getAvaragePeriod');
         Route::put('avarageperiod', 'propertyNotImplemented');
 
-        Route::get('cloudcover', 'cloudcover');
+        Route::get('cloudcover', 'getMeasure');
         Route::get('description', 'getDescription');
-        Route::get('dewpoint', 'dewpoint');
+        Route::get('dewpoint', 'getMeasure');
         Route::get('driverinfo', 'driverInfo');
         Route::get('driverversion', 'driverVersion');
-        Route::get('humidity', 'humidity');
+        Route::get('humidity', 'getMeasure');
         Route::get('interfaceversion', 'interfaceVersion');
         Route::get('name', 'name');
-        Route::get('pressure', 'pressure');
-        Route::get('rainrate', 'rainrate');
-        Route::get('skybrightness', 'skybrightness');
-        Route::get('skyquality', 'skyquality');
-        Route::get('skytemperature', 'skytemperature');
-        Route::get('starfwhm','starfwhm');
+        Route::get('pressure', 'getMeasure');
+        Route::get('rainrate', 'getMeasure');
+        Route::get('skybrightness', 'getMeasure');
+        Route::get('skyquality', 'getMeasure');
+        Route::get('skytemperature', 'getMeasure');
+        Route::get('starfwhm','getMeasure');
         Route::get('supportedactions','propertyNotImplemented');
-        Route::get('temperature', 'temperature');
-        Route::get('winddirection', 'windDirection');
-        Route::get('windgust',  'windGust');
-        Route::get('windspeed','windSpeed');
+        Route::get('temperature', 'getMeasure');
+        Route::get('winddirection', 'getMeasure');
+        Route::get('windgust',  'getMeasure');
+        Route::get('windspeed','getMeasure');
 
         //methods
         Route::put('action','actionNotImplemented');
