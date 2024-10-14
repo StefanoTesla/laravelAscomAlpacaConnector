@@ -27,16 +27,19 @@ class AscomSender{
         'windspeed' => null,
     ];
 
-    foreach($cache as $measure => $data){
-        if(isset($data['sync'])){
-            if(($data['sync'] < now()->subMinutes(10))){
+    if(isset($cache)){
+        foreach($cache as $measure => $data){
+            if(isset($data['sync'])){
+                if(($data['sync'] < now()->subMinutes(10))){
+                    unset($cache[$measure]);
+                }
+            } else {
                 unset($cache[$measure]);
             }
-        } else {
-            unset($cache[$measure]);
+    
         }
-
     }
+
 
     
 
@@ -65,7 +68,6 @@ class AscomSender{
 
     Cache::forever('ascom.weatherdata', $struct);
 
-    dd($struct);
     }
 
     static function getData(){
