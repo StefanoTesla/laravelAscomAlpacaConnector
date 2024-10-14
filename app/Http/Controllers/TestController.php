@@ -24,7 +24,20 @@ class TestController extends Controller
 {
     public function test(Request $request){
  
+        $temp = Temperature::where('sync','==',false)
+                            ->orderBy('ack_time','asc')
+                            ->get();
+        $temp = $temp->groupBy('ack_time');
 
+        foreach($temp as $single){
+            if (count($single) == 1){
+
+            } else {
+                $single[0]->delete();
+            }
+        }
+
+        dd($temp);
 
 }
 }
