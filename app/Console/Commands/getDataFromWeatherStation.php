@@ -9,14 +9,11 @@ use App\Models\WeatherData\RainRate;
 use App\Models\WeatherData\Temperature;
 use App\Models\WeatherData\Wind;
 use App\Models\WeatherData\WindGust;
-use App\Models\WeatherStation;
 use App\Services\WeatherData\AscomSender;
 use App\Services\WeatherStations\Gw2000Service;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class getDataFromWeatherStation extends Command
@@ -42,9 +39,10 @@ class getDataFromWeatherStation extends Command
     {
         Log::channel('weather_station')->info("--- START DATA ACQUISITION ---");
         $service = new Gw2000Service();
-
+        $start = microtime(true);
         $gw2000 = $service->getLiveData();
-
+        $finish = $start - microtime(true);
+        Log::channel('weather_station')->info("Data ack in ".$finish." s");
 
         $validator = Validator::make($gw2000,
             [
@@ -159,6 +157,7 @@ class getDataFromWeatherStation extends Command
                  ],
         ];
         Log::channel('weather_station')->info("--- Weather Station Data Acquisition finish ---");
+
         $ascomData = [
             'dewpoint' => [
                 'value' => $validated['dew_point'],

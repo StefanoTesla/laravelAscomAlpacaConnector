@@ -26,7 +26,6 @@ class ObservingConditionController extends Controller
     }
     public function getMeasure(Request $request){
         $measure = last(request()->segments());
-        Log::info($measure);
         if(isset($this->data[$measure])){
             return Response::json(['Value' =>$this->data[$measure]['value'] ,'ErrorNumber' =>0, 'ErrorMessages' => '']);
         }

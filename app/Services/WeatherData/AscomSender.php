@@ -80,12 +80,4 @@ class AscomSender{
         
     }
 
-
-
-    private function cleanCache($cache){
-
-
-        return $cache;
-    }
-
 }
