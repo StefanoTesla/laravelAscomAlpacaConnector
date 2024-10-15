@@ -85,7 +85,7 @@ class GetDataFromMySQM extends Command
                 'desc' => SkyTemperature::getDescription()
                 ],
             'cloudcover' => [
-                'value' => $validated['rain_rate'],
+                'value' => $validated['cloud_cover'],
                 'sync' => $now,
                 'desc' => CloudCover::getDescription()
                 ]
