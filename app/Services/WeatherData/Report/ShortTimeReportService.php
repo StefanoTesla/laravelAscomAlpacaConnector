@@ -42,35 +42,35 @@ class ShortTimeReportService{
 
             $t = $this->getAvgTemperature();
             if(isset($t)){
-                $interval->temperature = $t;
+                $interval->temperature = round($t,2);
             }
             $d = $this->getAvgDewPoint();
             if(isset($d)){
-                $interval->dew_point = $d;
+                $interval->dew_point = round($d,2);
             }
             $h = $this->getAvgHumidity();
             if(isset($h)){
-                $interval->humidity = $h;
+                $interval->humidity = intval($h);
             }
             $p = $this->getAvgPressure();
             if(isset($p)){
-                $interval->pressure = $p;
+                $interval->pressure = round($p,2);
             }
             $r = $this->getMaxRainRate();
             if(isset($r)){
-                $interval->rain_rate = $r;
+                $interval->rain_rate = round($r,2);
             }
             $g = $this->getMaxGustSpeed();
             if(isset($g)){
-                $interval->gust_speed = $g;
+                $interval->gust_speed = round($g,2);
             }
             $w = $this->getAvgWind();
             
             if(isset($w['speed'])){
-                $interval->wind_speed = $w['speed'];
+                $interval->wind_speed = round($w['speed'],2);
             }
             if(isset($w['direction'])){
-                $interval->wind_dir = $w['direction'];
+                $interval->wind_dir = round($w['direction'],2);
             }
 
             $interval->save();
