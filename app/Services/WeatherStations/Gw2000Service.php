@@ -53,11 +53,12 @@ class Gw2000Service{
 
     public function getLiveData(){
         try{
-            $response =  Http::get('http://'.$this->ip.'/'.self::LIVE_DATA_URL);
+            $response =  Http::get('http://'.$this->ip.'/'.self::LIVE_DATA_URL); 
         }
         catch (Exception $e) {
             return $e;
         }
+
 
         try{
             $data = $this->handleLiveData($response);

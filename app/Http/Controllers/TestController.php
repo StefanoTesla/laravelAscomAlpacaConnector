@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WeatherData\Report\ShortTimeReport;
 use App\Models\WeatherData\SingleMeasure\DewPoint;
 use App\Models\WeatherData\SingleMeasure\Humidity;
 use App\Models\WeatherData\SingleMeasure\Pressure;
@@ -26,6 +27,8 @@ class TestController extends Controller
 {
     public function test(Request $request){
  
+        $rep = new ShortTimeReportService();
 
+        $rep->createReport();
     }
 }
