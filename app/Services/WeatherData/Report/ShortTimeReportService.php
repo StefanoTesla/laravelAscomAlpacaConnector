@@ -28,10 +28,10 @@ class ShortTimeReportService{
             Log::channel('weather_short_report')->info("nothing to report");
             return;
         }
-        
-        $this->currentInterval = $this->startMainInterval->copy(); 
-    
-    
+
+        $this->currentInterval = $this->startMainInterval->copy();
+
+
         while ($this->currentInterval < $this->endMainInterval) {
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
             Log::channel('weather_short_report')->info("Handling data from: ". $this->currentInterval->format('Y-m-d H:i') ." to: ". $this->endInterval->format('Y-m-d H:i') );
@@ -65,7 +65,7 @@ class ShortTimeReportService{
                 $interval->gust_speed = round($g,2);
             }
             $w = $this->getAvgWind();
-            
+
             if(isset($w['speed'])){
                 $interval->wind_speed = round($w['speed'],2);
             }
@@ -81,11 +81,16 @@ class ShortTimeReportService{
                 Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
                 $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
                 Log::channel('weather_short_report')->emergency("Lo risalvo");
-                $interval->save();
-                $this->setSyncedMeasure();
+                try {
+                    $interval->save();
+                    $this->setSyncedMeasure();
+                } catch (\Throwable $th) {
+                    Log::channel('weather_short_report')->emergency("non c'è verso!");
+                }
+
                 Log::channel('weather_short_report')->emergency($th);
             }
-            
+
             // Aggiungi 5 minuti all'intervallo corrente
             $this->currentInterval->addMinutes(5);
             Log::channel('weather_short_report')->info("Short Report created");
@@ -94,7 +99,7 @@ class ShortTimeReportService{
     }
     private function getEndOfMainInterval(){
         $now=now();
-        $minutes = intval($now->format('i')); 
+        $minutes = intval($now->format('i'));
         $roundedMinutes = floor($minutes / 5) * 5;
         return $now->copy()->minute($roundedMinutes)->second(0);
 
@@ -102,7 +107,7 @@ class ShortTimeReportService{
     private function getOldestMeasureTime():?Carbon{
         $array =[];
         $selected = null;
-        
+
         $array[] = Temperature::where('sync','=',false)
             ->where('ack_time','<',$this->endMainInterval)
             ->orderBy('ack_time','asc')
@@ -146,7 +151,7 @@ class ShortTimeReportService{
             return now();
         }
 
-        $minutes = intval($selected->format('i')); 
+        $minutes = intval($selected->format('i'));
         $roundedMinutes = floor($minutes / 5) * 5;
         $oldest = $selected->copy()->minute($roundedMinutes)->second(0);
 
@@ -188,23 +193,23 @@ class ShortTimeReportService{
         if($count == 0){
             return null;
         }
-        
+
         foreach($temp as $reading){
                 $value = $reading['value'];
                 $direction = $reading['direction'];
-            
+
                 // Converti la direzione da gradi a radianti
                 $radians = deg2rad($direction);
-            
+
                 // Calcola le componenti x e y
                 $vx = $value * cos($radians);
                 $vy = $value * sin($radians);
-            
+
                 // Somma le componenti
                 $sumX += $vx;
                 $sumY += $vy;
         }
-        
+
         // Calcola la media delle componenti x e y
         $mean_vx = $sumX / $count;
         $mean_vy = $sumY / $count;
@@ -214,7 +219,7 @@ class ShortTimeReportService{
 
         // Calcola la direzione media
         $mean_direction = rad2deg(atan2($mean_vy, $mean_vx));
-        
+
         // Assicurati che la direzione sia positiva
         if ($mean_direction < 0) {
             $mean_direction += 360;
