@@ -79,8 +79,15 @@ class ShortTimeReportService{
                 $this->setSyncedMeasure();
             } catch (\Throwable $th) {
                 Log::channel('weather_short_report')->emergency("errore di storicizzazione");
+                Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
+                $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
+                Log::channel('weather_short_report')->emergency("Lo risalvo");
+                $interval->save();
+                $this->setSyncedMeasure();
                 Log::channel('weather_short_report')->emergency($th);
             }
+
+
 
             
             // Aggiungi 5 minuti all'intervallo corrente
