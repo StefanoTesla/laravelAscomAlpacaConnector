@@ -73,9 +73,18 @@ class ShortTimeReportService{
                 $interval->wind_dir = round($w['direction'],2);
             }
 
-            $interval->save();
-
-            $this->setSyncedMeasure();
+            try {
+                $interval->save();
+                $this->setSyncedMeasure();
+            } catch (\Throwable $th) {
+                Log::channel('weather_short_report')->emergency("errore di storicizzazione");
+                Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
+                $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
+                Log::channel('weather_short_report')->emergency("Lo risalvo");
+                $interval->save();
+                $this->setSyncedMeasure();
+                Log::channel('weather_short_report')->emergency($th);
+            }
             
             // Aggiungi 5 minuti all'intervallo corrente
             $this->currentInterval->addMinutes(5);
