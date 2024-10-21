@@ -73,9 +73,14 @@ class ShortTimeReportService{
                 $interval->wind_dir = round($w['direction'],2);
             }
 
-            $interval->save();
+            try {
+                $interval->save();
 
-            $this->setSyncedMeasure();
+                $this->setSyncedMeasure();
+            } catch (\Throwable $th) {
+                Log::channel('weather_short_report')->emergency($th);
+            }
+
             
             // Aggiungi 5 minuti all'intervallo corrente
             $this->currentInterval->addMinutes(5);
