@@ -78,6 +78,7 @@ class ShortTimeReportService{
 
                 $this->setSyncedMeasure();
             } catch (\Throwable $th) {
+                Log::channel('weather_short_report')->emergency("errore di storicizzazione");
                 Log::channel('weather_short_report')->emergency($th);
             }
 
