@@ -97,11 +97,11 @@ class ShortTimeReportService{
             }
             $sb = $this->getAvgSkyBrigthness();
             if(isset($sb)){
-                $interval->gust_speed = round($sb,2);
+                $interval->sky_brigthness = round($sb,2);
             }
-            $st = $this->getAvgSkyTemperature();
-            if(isset($st)){
-                $interval->gust_speed = round($g,2);
+            $cc = $this->getAvgCloudCover();
+            if(isset($cc)){
+                $interval->cloud_cover = round($cc,2);
             }
 
             try {
