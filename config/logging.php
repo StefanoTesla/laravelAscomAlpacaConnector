@@ -145,7 +145,14 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/reports/short_report.log'),
             'level' => 'debug',
-            'days' => 1
+            'days' => 3
+        ],
+
+        'wt_short_report_sender' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/reports/short_report_sender.log'),
+            'level' => 'debug',
+            'days' => 3
         ],
 
     ],

@@ -15,11 +15,18 @@ class ReportSenderService{
 
     public function main(){
 
+    Log::channel('wt_short_report_sender')->info("Start sending data...");
+    $count =ShortTimeReport::where('sync',0)->count();
+
+    if($count == 0){
+        Log::channel('wt_short_report_sender')->info("nothing to sync with the server");
+    }
+
     if(!$this->login()){
-        Log::info("Login failed");
+        Log::channel('wt_short_report_sender')->info("Login failed");
         return;
     };
-  
+
     $reportsToSync = ShortTimeReport::where('sync',0)
                         ->orderBy('interval','asc')
                         ->get();
@@ -34,36 +41,36 @@ class ReportSenderService{
 
             $data = $response->json();
 
-            Log::info($response->status());
+            Log::channel('wt_short_report_sender')->info($response->status());
 
             if($response->successful()){
                 $this->updateSyncValue($data['valid_rows'],1);
-                Log::info("Dati inviati correttamente");
+                Log::channel('wt_short_report_sender')->info("Dati inviati correttamente");
             } else {
 
                 if($response->status() == 422){
-                    Log::info("Alcuni dati contengono errori");
+                    Log::channel('wt_short_report_sender')->info("Alcuni dati contengono errori");
                     if(!empty($data['valid_rows'])){
                         $this->updateSyncValue($data['valid_rows'],1);
-                        Log::info("Aggiorno i dati validi");
+                        Log::channel('wt_short_report_sender')->info("Aggiorno i dati validi");
                     }
                     if(!empty($data['invalid_rows'])){
-                        Log::info("Aggiorno i dati con errori");
+                        Log::channel('wt_short_report_sender')->info("Aggiorno i dati con errori");
                         $intervals =[];
                         foreach($data['invalid_rows'] as $unvalid){
                             if(isset($unvalid['interval'])){
                                 $intervals[] = $unvalid['interval'];
-                                Log::error("Nella data :".$unvalid['interval']." ci sono errori.");
+                                Log::channel('wt_short_report_sender')->error("Nella data :".$unvalid['interval']." ci sono errori.");
                             } else {
-                                Log::error("Campo interval mancante.");
+                                Log::channel('wt_short_report_sender')->error("Campo interval mancante.");
                             }
-                            Log::error($unvalid['errors']);
+                            Log::channel('wt_short_report_sender')->error($unvalid['errors']);
                         }
                         $this->updateSyncValue($intervals,2);
                     }
                 } else {
                     $status = $response->status();
-                    Log::error("Remote server response {$status}, abort");
+                    Log::channel('wt_short_report_sender')->error("Remote server response {$status}, abort");
                     return;
                 };
             }
@@ -71,16 +78,15 @@ class ReportSenderService{
 
     };
 
-
+    Log::channel('wt_short_report_sender')->info("Sended all pending data...");
     }
 
 
 private function updateSyncValue(array $intervals,int $status){
     $formattedIntervals = array_map(function($interval) {
-        // Converte l'intervallo usando Carbon e restituisce nel formato desiderato
         return Carbon::parse($interval)->format('Y-m-d H:i:s');
     }, $intervals);
-    Log::info(ShortTimeReport::whereIn('interval', $formattedIntervals)->update(['sync' => $status]));
+    ShortTimeReport::whereIn('interval', $formattedIntervals)->update(['sync' => $status]);
 }
 
 
