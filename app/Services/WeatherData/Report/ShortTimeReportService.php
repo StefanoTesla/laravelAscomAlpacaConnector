@@ -34,7 +34,16 @@ class ShortTimeReportService{
 
         while ($this->currentInterval < $this->endMainInterval) {
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
-            Log::channel('weather_short_report')->info("Handling data from: ". $this->currentInterval->format('Y-m-d H:i') ." to: ". $this->endInterval->format('Y-m-d H:i') );
+
+            if($this->endInterval > now()){
+                Log::info("can't handle the future");
+                return;
+            }
+
+            $localeStart = $this->currentInterval->copy()->setTimezone('Europe/Rome');
+            $localeEnd = $this->endInterval->copy()->setTimezone('Europe/Rome');
+
+            Log::channel('weather_short_report')->info("Handling data from: ". $localeStart->format('Y-m-d H:i') ." to: ". $localeEnd->format('Y-m-d H:i') );
             $interval = new ShortTimeReport([
                 'interval' => $this->endInterval,
                 'sync' => false
@@ -80,12 +89,16 @@ class ShortTimeReportService{
                 Log::channel('weather_short_report')->emergency("errore di storicizzazione");
                 Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
                 $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
-                Log::channel('weather_short_report')->emergency("Lo risalvo");
-                try {
-                    $interval->save();
-                    $this->setSyncedMeasure();
-                } catch (\Throwable $th) {
-                    Log::channel('weather_short_report')->emergency("non c'è verso!");
+                if($find){
+
+                    Log::channel('weather_short_report')->emergency("Lo risalvo");
+                    try {
+                        $interval->save();
+                        $this->setSyncedMeasure();
+                    } catch (\Throwable $th) {
+                        Log::channel('weather_short_report')->emergency("non c'è verso!");
+                    }
+
                 }
 
                 Log::channel('weather_short_report')->emergency($th);
