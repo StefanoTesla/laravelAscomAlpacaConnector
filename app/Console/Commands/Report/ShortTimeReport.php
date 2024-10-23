@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Report;
 
 
 use App\Services\WeatherData\Report\ShortTimeReportService;

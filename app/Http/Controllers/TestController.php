@@ -11,6 +11,7 @@ use App\Models\WeatherData\SingleMeasure\Temperature;
 use App\Models\WeatherData\SingleMeasure\Wind;
 use App\Models\WeatherData\SingleMeasure\WindGust;
 use App\Services\Ascom\AscomObservingCache;
+use App\Services\WeatherData\Report\ReportSenderService;
 use App\Services\WeatherData\Report\ShortTimeReportService;
 use App\Services\WeatherStations\Gw2000Service;
 use App\Services\WeatherStations\MySQMService;
@@ -28,8 +29,7 @@ class TestController extends Controller
 {
     public function test(Request $request){
  
-        $rep = new MySQMService();
-        $data = $rep->getLiveData();
-        dd($data);
+        $rep = new ReportSenderService();
+        $rep->main();
     }
 }

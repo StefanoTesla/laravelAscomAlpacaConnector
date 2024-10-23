@@ -3,10 +3,14 @@
 namespace App\Services\WeatherData\Report;
 
 use App\Models\WeatherData\Report\ShortTimeReport;
+use App\Models\WeatherData\SingleMeasure\CloudCover;
 use App\Models\WeatherData\SingleMeasure\DewPoint;
 use App\Models\WeatherData\SingleMeasure\Humidity;
 use App\Models\WeatherData\SingleMeasure\Pressure;
 use App\Models\WeatherData\SingleMeasure\RainRate;
+use App\Models\WeatherData\SingleMeasure\SkyBrightness;
+use App\Models\WeatherData\SingleMeasure\SkyQuality;
+use App\Models\WeatherData\SingleMeasure\SkyTemperature;
 use App\Models\WeatherData\SingleMeasure\Temperature;
 use App\Models\WeatherData\SingleMeasure\Wind;
 use App\Models\WeatherData\SingleMeasure\WindGust;
@@ -73,6 +77,7 @@ class ShortTimeReportService{
             if(isset($g)){
                 $interval->gust_speed = round($g,2);
             }
+
             $w = $this->getAvgWind();
 
             if(isset($w['speed'])){
@@ -80,6 +85,23 @@ class ShortTimeReportService{
             }
             if(isset($w['direction'])){
                 $interval->wind_dir = round($w['direction'],2);
+            }
+
+            $st = $this->getAvgSkyTemperature();
+            if(isset($st)){
+                $interval->sky_temperature = round($st,2);
+            }
+            $sq = $this->getAvgSkyQuality();
+            if(isset($sq)){
+                $interval->sqm = round($sq,2);
+            }
+            $sb = $this->getAvgSkyBrigthness();
+            if(isset($sb)){
+                $interval->gust_speed = round($sb,2);
+            }
+            $st = $this->getAvgSkyTemperature();
+            if(isset($st)){
+                $interval->gust_speed = round($g,2);
             }
 
             try {
@@ -147,6 +169,26 @@ class ShortTimeReportService{
             ->pluck('ack_time')
             ->first();
         $array[] = WindGust::where('sync','=',false)
+            ->where('ack_time','<',$this->endMainInterval)
+            ->orderBy('ack_time','asc')
+            ->pluck('ack_time')
+            ->first();
+        $array[] = SkyBrightness::where('sync','=',false)
+            ->where('ack_time','<',$this->endMainInterval)
+            ->orderBy('ack_time','asc')
+            ->pluck('ack_time')
+            ->first();
+        $array[] = SkyTemperature::where('sync','=',false)
+            ->where('ack_time','<',$this->endMainInterval)
+            ->orderBy('ack_time','asc')
+            ->pluck('ack_time')
+            ->first();
+        $array[] = SkyQuality::where('sync','=',false)
+            ->where('ack_time','<',$this->endMainInterval)
+            ->orderBy('ack_time','asc')
+            ->pluck('ack_time')
+            ->first();
+        $array[] = CloudCover::where('sync','=',false)
             ->where('ack_time','<',$this->endMainInterval)
             ->orderBy('ack_time','asc')
             ->pluck('ack_time')
@@ -244,6 +286,20 @@ class ShortTimeReportService{
             ];
 
     }
+
+    private function getAvgSkyTemperature(){
+        return SkyTemperature::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
+    }
+    private function getAvgSkyQuality(){
+        return SkyQuality::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
+    }
+    private function getAvgSkyBrigthness(){
+        return SkyBrightness::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
+    }
+    private function getAvgCloudCover(){
+        return CloudCover::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
+    }
+
     private function setSyncedMeasure(){
         Temperature::where('sync', '=', false)
            ->where('ack_time', '>=', $this->currentInterval)

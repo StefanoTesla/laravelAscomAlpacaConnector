@@ -21,7 +21,7 @@ return new class extends Migration
             $table->float('gust_speed',2)->nullable();
             $table->float('wind_speed',2)->nullable();
             $table->integer('wind_dir')->nullable();
-            $table->boolean('sync')->default(0);
+            $table->integer('sync')->default(0);
         });
     }
 

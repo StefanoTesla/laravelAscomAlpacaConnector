@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Report;
 
 use App\Models\WeatherData\Report\ShortTimeReport;
 use App\Models\WeatherData\SingleMeasure\DewPoint;
@@ -19,7 +19,7 @@ class ReportReset extends Command
      *
      * @var string
      */
-    protected $signature = 'report:reset';
+    protected $signature = 'report:delete';
 
     /**
      * The console command description.
