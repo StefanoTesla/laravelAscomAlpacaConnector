@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sky_brightness', function (Blueprint $table) {
+        Schema::create('sky_brightnesses', function (Blueprint $table) {
             $table->id();
             $table->float('value',4);
             $table->dateTime('ack_time');
