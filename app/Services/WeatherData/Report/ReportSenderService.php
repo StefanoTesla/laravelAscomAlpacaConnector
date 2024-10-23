@@ -41,30 +41,31 @@ class ReportSenderService{
                 Log::info("Dati inviati correttamente");
             } else {
 
-                if($response->status() == 404){
-                    Log::error("Unable to contact remote server");
+                if($response->status() == 422){
+                    Log::info("Alcuni dati contengono errori");
+                    if(!empty($data['valid_rows'])){
+                        $this->updateSyncValue($data['valid_rows'],1);
+                        Log::info("Aggiorno i dati validi");
+                    }
+                    if(!empty($data['invalid_rows'])){
+                        Log::info("Aggiorno i dati con errori");
+                        $intervals =[];
+                        foreach($data['invalid_rows'] as $unvalid){
+                            if(isset($unvalid['interval'])){
+                                $intervals[] = $unvalid['interval'];
+                                Log::error("Nella data :".$unvalid['interval']." ci sono errori.");
+                            } else {
+                                Log::error("Campo interval mancante.");
+                            }
+                            Log::error($unvalid['errors']);
+                        }
+                        $this->updateSyncValue($intervals,2);
+                    }
+                } else {
+                    $status = $response->status();
+                    Log::error("Remote server response {$status}, abort");
                     return;
                 };
-
-                Log::info("Alcuni dati contengono errori");
-                if(!empty($data['valid_rows'])){
-                    $this->updateSyncValue($data['valid_rows'],1);
-                    Log::info("Aggiorno i dati validi");
-                }
-                if(!empty($data['invalid_rows'])){
-                    Log::info("Aggiorno i dati con errori");
-                    $intervals =[];
-                    foreach($data['invalid_rows'] as $unvalid){
-                        if(isset($unvalid['interval'])){
-                            $intervals[] = $unvalid['interval'];
-                            Log::error("Nella data :".$unvalid['interval']." ci sono errori.");
-                        } else {
-                            Log::error("Campo interval mancante.");
-                        }
-                        Log::error($unvalid['errors']);
-                    }
-                    $this->updateSyncValue($intervals,2);
-                }
             }
             $intervals = [];
 
@@ -166,12 +167,6 @@ private function updateSyncValue(array $intervals,int $status){
             }
         }
     return false;
-    }
-
-
-    private function sendData($data){
-
-        
     }
 
 }

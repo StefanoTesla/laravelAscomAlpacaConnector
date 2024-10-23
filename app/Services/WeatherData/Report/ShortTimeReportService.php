@@ -40,7 +40,6 @@ class ShortTimeReportService{
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
 
             if($this->endInterval > now()){
-                Log::info("can't handle the future");
                 return;
             }
 
