@@ -40,7 +40,6 @@ class ShortTimeReportService{
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
 
             if($this->endInterval > now()){
-                Log::info("can't handle the future");
                 return;
             }
 
@@ -325,7 +324,19 @@ class ShortTimeReportService{
            ->where('ack_time', '>=', $this->currentInterval)
            ->where('ack_time', '<=', $this->endInterval)
            ->update(['sync' => true]);
-        RainRate::where('sync', '=', false)
+        SkyTemperature::where('sync', '=', false)
+           ->where('ack_time', '>=', $this->currentInterval)
+           ->where('ack_time', '<=', $this->endInterval)
+           ->update(['sync' => true]);
+        SkyBrightness::where('sync', '=', false)
+           ->where('ack_time', '>=', $this->currentInterval)
+           ->where('ack_time', '<=', $this->endInterval)
+           ->update(['sync' => true]);
+        SkyQuality::where('sync', '=', false)
+           ->where('ack_time', '>=', $this->currentInterval)
+           ->where('ack_time', '<=', $this->endInterval)
+           ->update(['sync' => true]);
+        CloudCover::where('sync', '=', false)
            ->where('ack_time', '>=', $this->currentInterval)
            ->where('ack_time', '<=', $this->endInterval)
            ->update(['sync' => true]);
