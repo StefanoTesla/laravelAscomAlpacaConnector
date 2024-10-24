@@ -10,9 +10,13 @@ use App\Models\WeatherData\SingleMeasure\RainRate;
 use App\Models\WeatherData\SingleMeasure\Temperature;
 use App\Models\WeatherData\SingleMeasure\Wind;
 use App\Models\WeatherData\SingleMeasure\WindGust;
+use App\Models\WeatherData\SingleMeasure\SkyQuality;
+use App\Models\WeatherData\SingleMeasure\SkyBrightness;
+use App\Models\WeatherData\SingleMeasure\SkyTemperature;
+use App\Models\WeatherData\SingleMeasure\CloudCover;
 use Illuminate\Console\Command;
 
-class ReportReset extends Command
+class DeleteShortReport extends Command
 {
     /**
      * The name and signature of the console command.
@@ -49,6 +53,14 @@ class ReportReset extends Command
             WindGust::where('sync', '=', true)
                ->update(['sync' => false]);
             RainRate::where('sync', '=', true)
+               ->update(['sync' => false]);
+            SkyTemperature::where('sync', '=', true)
+               ->update(['sync' => false]);
+            SkyBrightness::where('sync', '=', true)
+               ->update(['sync' => false]);
+            SkyQuality::where('sync', '=', true)
+               ->update(['sync' => false]);
+            CloudCover::where('sync', '=', true)
                ->update(['sync' => false]);
         }
 
