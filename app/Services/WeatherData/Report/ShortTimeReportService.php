@@ -177,14 +177,14 @@ class ShortTimeReportService{
                 case 'avg':
                     $avg = $model['class']::where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
                     if(isset($avg)){
-                        $interval->$key = $avg;
+                        $interval->$key = round($avg,2);
                     }
                     break;
 
                 case 'max':
                     $max = $model['class']::where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
                     if(isset($max)){
-                        $interval->$key = $max;
+                        $interval->$key = round($max,2);
                     }
                     break;
 
@@ -197,9 +197,8 @@ class ShortTimeReportService{
 
                     $avg = $this->calcAvgWind($winds);
 
-                    $interval->wind_speed = $avg['speed'];
-                    $interval->wind_dir = $avg['direction'];
-
+                    $interval->wind_speed = round($avg['speed'],2);
+                    $interval->wind_dir = round($avg['direction'],2);
                     break;
             }
         }
