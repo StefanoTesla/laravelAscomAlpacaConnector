@@ -3,25 +3,65 @@
 namespace App\Services\WeatherData\Report;
 
 use App\Models\WeatherData\Report\ShortTimeReport;
-use App\Models\WeatherData\SingleMeasure\CloudCover;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+
+use App\Models\WeatherData\SingleMeasure\Temperature;
 use App\Models\WeatherData\SingleMeasure\DewPoint;
 use App\Models\WeatherData\SingleMeasure\Humidity;
 use App\Models\WeatherData\SingleMeasure\Pressure;
 use App\Models\WeatherData\SingleMeasure\RainRate;
+use App\Models\WeatherData\SingleMeasure\Wind;
+use App\Models\WeatherData\SingleMeasure\WindGust;
 use App\Models\WeatherData\SingleMeasure\SkyBrightness;
 use App\Models\WeatherData\SingleMeasure\SkyQuality;
 use App\Models\WeatherData\SingleMeasure\SkyTemperature;
-use App\Models\WeatherData\SingleMeasure\Temperature;
-use App\Models\WeatherData\SingleMeasure\Wind;
-use App\Models\WeatherData\SingleMeasure\WindGust;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
+use App\Models\WeatherData\SingleMeasure\CloudCover;
+
 
 class ShortTimeReportService{
     private $startMainInterval;
     private $endMainInterval;
+    private $endLoopTime;
     private $currentInterval;
     private $endInterval;
+
+    private const MODELS = [
+        'temperature' =>[
+            'class'=> Temperature::class,
+            'calc' => 'avg'],
+        'dew_point' =>[
+            'class'=> DewPoint::class,
+            'calc' => 'avg'],
+        'humidity' =>[
+            'class'=> Humidity::class,
+            'calc' => 'avg'],
+        'pressure' =>[
+            'class'=> Pressure::class,
+            'calc' => 'avg'],
+        'rain_rate' =>[
+            'class'=> RainRate::class,
+            'calc' => 'max'],
+        'wind' =>[
+            'class'=> Wind::class,
+            'calc' => 'wind'],
+        'gust_speed' =>[
+            'class'=> WindGust::class,
+            'calc' => 'max'],
+        'sky_brightness' =>[
+            'class'=> SkyBrightness::class,
+            'calc' => 'avg'],
+        'sky_temperature' =>[
+            'class'=> SkyTemperature::class,
+            'calc' => 'avg'],
+        'sqm' =>[
+            'class'=> SkyQuality::class,
+            'calc' => 'avg'],
+        'cloud_cover' =>[
+            'class'=> CloudCover::class,
+            'calc' => 'max'],
+        ];
+
 
     public function createReport(){
         /* check the end interval time  now roundend to the fifth minutes */
@@ -35,11 +75,13 @@ class ShortTimeReportService{
 
         $this->currentInterval = $this->startMainInterval->copy();
 
+        $this->endLoopTime = $this->endMainInterval->copy()->subMinutes(5);
 
-        while ($this->currentInterval < $this->endMainInterval) {
+        while ($this->currentInterval <= $this->endLoopTime) {
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
 
             if($this->endInterval > now()){
+                Log::channel('weather_short_report')->info("long sad story");
                 return;
             }
 
@@ -47,61 +89,9 @@ class ShortTimeReportService{
             $localeEnd = $this->endInterval->copy()->setTimezone('Europe/Rome');
 
             Log::channel('weather_short_report')->info("Handling data from: ". $localeStart->format('Y-m-d H:i') ." to: ". $localeEnd->format('Y-m-d H:i') );
-            $interval = new ShortTimeReport([
-                'interval' => $this->endInterval,
-                'sync' => false
-            ]);
+            
+            $interval = $this->computeData();
 
-            $t = $this->getAvgTemperature();
-            if(isset($t)){
-                $interval->temperature = round($t,2);
-            }
-            $d = $this->getAvgDewPoint();
-            if(isset($d)){
-                $interval->dew_point = round($d,2);
-            }
-            $h = $this->getAvgHumidity();
-            if(isset($h)){
-                $interval->humidity = intval($h);
-            }
-            $p = $this->getAvgPressure();
-            if(isset($p)){
-                $interval->pressure = round($p,2);
-            }
-            $r = $this->getMaxRainRate();
-            if(isset($r)){
-                $interval->rain_rate = round($r,2);
-            }
-            $g = $this->getMaxGustSpeed();
-            if(isset($g)){
-                $interval->gust_speed = round($g,2);
-            }
-
-            $w = $this->getAvgWind();
-
-            if(isset($w['speed'])){
-                $interval->wind_speed = round($w['speed'],2);
-            }
-            if(isset($w['direction'])){
-                $interval->wind_dir = round($w['direction'],2);
-            }
-
-            $st = $this->getAvgSkyTemperature();
-            if(isset($st)){
-                $interval->sky_temperature = round($st,2);
-            }
-            $sq = $this->getAvgSkyQuality();
-            if(isset($sq)){
-                $interval->sqm = round($sq,2);
-            }
-            $sb = $this->getAvgSkyBrigthness();
-            if(isset($sb)){
-                $interval->sky_brigthness = round($sb,2);
-            }
-            $cc = $this->getAvgCloudCover();
-            if(isset($cc)){
-                $interval->cloud_cover = round($cc,2);
-            }
 
             try {
                 $interval->save();
@@ -111,18 +101,20 @@ class ShortTimeReportService{
                 Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
                 $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
                 if($find){
-
-                    Log::channel('weather_short_report')->emergency("Lo risalvo");
+                    
                     try {
+                        Log::channel('weather_short_report')->emergency("Lo risalvo");
                         $interval->save();
+                        Log::channel('weather_short_report')->emergency("salvato");
                         $this->setSyncedMeasure();
                     } catch (\Throwable $th) {
                         Log::channel('weather_short_report')->emergency("non c'è verso!");
+                        Log::channel('weather_short_report')->emergency($th);
                     }
 
                 }
 
-                Log::channel('weather_short_report')->emergency($th);
+                
             }
 
             // Aggiungi 5 minuti all'intervallo corrente
@@ -138,66 +130,25 @@ class ShortTimeReportService{
         return $now->copy()->minute($roundedMinutes)->second(0);
 
     }
+
     private function getOldestMeasureTime():?Carbon{
         $array =[];
         $selected = null;
 
-        $array[] = Temperature::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = DewPoint::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = Humidity::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = Pressure::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = RainRate::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = WindGust::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = SkyBrightness::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = SkyTemperature::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = SkyQuality::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
-        $array[] = CloudCover::where('sync','=',false)
-            ->where('ack_time','<',$this->endMainInterval)
-            ->orderBy('ack_time','asc')
-            ->pluck('ack_time')
-            ->first();
+        //scroll al the reportable measure
+        foreach(self::MODELS as $key => $model){
+            $array[$key] = $model['class']::where('sync',false)
+                                ->where('ack_time','<',$this->endMainInterval)
+                                ->orderBy('ack_time','asc')
+                                ->pluck('ack_time')
+                                ->first();
+        }
 
-        foreach($array as $datatime){
+        foreach($array as $datetime){
             if($selected == null){
-                $selected = $datatime;
-            } elseif(!is_null($datatime) && ($datatime < $selected)){
-                    $selected = $datatime;
+                $selected = $datetime;
+            } elseif(!is_null($datetime) && ($datetime < $selected)){
+                    $selected = $datetime;
                 }
             }
 
@@ -211,44 +162,66 @@ class ShortTimeReportService{
 
         return $oldest;
     }
-    private function getAvgTemperature(){
-        return Temperature::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getAvgDewPoint(){
-        return DewPoint::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
 
+    private function computeData():ShortTimeReport{
+
+        $interval = new ShortTimeReport([
+            'interval' => $this->endInterval,
+            'sync' => false
+        ]);
+        foreach(self::MODELS as $key => $model){
+            $avg = null;
+            $max= null;
+
+            switch ($model['calc']){
+                case 'avg':
+                    $avg = $model['class']::where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
+                    if(isset($avg)){
+                        $interval->$key = $avg;
+                    }
+                    break;
+
+                case 'max':
+                    $max = $model['class']::where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
+                    if(isset($max)){
+                        $interval->$key = $max;
+                    }
+                    break;
+
+                case 'wind':
+                    $winds = Wind::where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->get();
+
+                    if(count($winds) == 0){
+                        break;
+                    }
+
+                    $avg = $this->calcAvgWind($winds);
+
+                    $interval->wind_speed = $avg['speed'];
+                    $interval->wind_dir = $avg['direction'];
+
+                    break;
+            }
+        }
+
+        return $interval;
     }
-    private function getAvgHumidity(){
-        return Humidity::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getAvgPressure(){
-        return Pressure::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getMaxGustSpeed(){
-        return WindGust::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
-    }
-    private function getMaxRainRate(){
-        return RainRate::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->max('value');
-    }
-    private function getAvgWind(){
-        $temp = Wind::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->get();
+
+    private function calcAvgWind($windsData){
         $wind = [
             'speed' => null,
             'direction' => null
         ];
-        if(is_null($temp)){
-            return $wind;
-        }
 
         $sumX = 0;
         $sumY = 0;
-        $count = count($temp);
+        $count = count($windsData);
 
         if($count == 0){
             return null;
         }
 
-        foreach($temp as $reading){
+        foreach($windsData as $reading){
                 $value = $reading['value'];
                 $direction = $reading['direction'];
 
@@ -286,60 +259,15 @@ class ShortTimeReportService{
 
     }
 
-    private function getAvgSkyTemperature(){
-        return SkyTemperature::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getAvgSkyQuality(){
-        return SkyQuality::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getAvgSkyBrigthness(){
-        return SkyBrightness::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
-    private function getAvgCloudCover(){
-        return CloudCover::where('sync','=',0)->where('ack_time','>=',$this->currentInterval)->where('ack_time','<',$this->endInterval)->avg('value');
-    }
 
     private function setSyncedMeasure(){
-        Temperature::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        DewPoint::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        Humidity::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        Pressure::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        WindGust::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        Wind::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        SkyTemperature::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        SkyBrightness::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        SkyQuality::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
-        CloudCover::where('sync', '=', false)
-           ->where('ack_time', '>=', $this->currentInterval)
-           ->where('ack_time', '<=', $this->endInterval)
-           ->update(['sync' => true]);
+
+        foreach(self::MODELS as $key => $model){
+            $array[$key] = $model['class']::where('sync',0)
+                                        ->where('ack_time', '>=', $this->currentInterval)
+                                        ->where('ack_time', '<=', $this->endInterval)
+                                        ->update(['sync' => true]);
+        }
 
     }
 
