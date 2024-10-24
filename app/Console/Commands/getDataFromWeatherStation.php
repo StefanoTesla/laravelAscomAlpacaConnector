@@ -37,7 +37,6 @@ class GetDataFromWeatherStation extends Command
      */
     public function handle()
     {
-        Log::channel('weather_station')->info("--- START DATA ACQUISITION ---");
         $service = new Gw2000Service();
         $start = microtime(true);
         $gw2000 = $service->getLiveData();
@@ -200,15 +199,15 @@ class GetDataFromWeatherStation extends Command
                      'desc' => Wind::getDescription()
                  ],
         ];
-        Log::channel('weather_station')->info("--- Refreshing Ascom Cache ---");
+
         try {
             AscomObservingCache::refreshCache($ascomData);
+            Log::channel('weather_station')->info("--- Refreshing Ascom Cache finish ---");
         } catch (Exception $th) {
             Log::channel('weather_station')->error($th);
         }
         
-
-        Log::channel('weather_station')->info("--- Refreshing Ascom Cache finish ---");
+        
     }     
         
 }

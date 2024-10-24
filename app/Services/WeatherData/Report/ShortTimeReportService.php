@@ -67,7 +67,6 @@ class ShortTimeReportService{
         /* check the end interval time  now roundend to the fifth minutes */
         $this->endMainInterval = $this->getEndOfMainInterval();
         $this->startMainInterval = $this->getOldestMeasureTime();
-        Log::channel('weather_short_report')->info("-- NEW SHORT REPORT STARTED --");
         if($this->startMainInterval >= $this->endMainInterval ){
             Log::channel('weather_short_report')->info("nothing to report");
             return;
@@ -81,7 +80,7 @@ class ShortTimeReportService{
             $this->endInterval = $this->currentInterval->copy()->addMinutes(5);
 
             if($this->endInterval > now()){
-                Log::channel('weather_short_report')->info("long sad story");
+                Log::channel('weather_short_report')->error("long sad story");
                 return;
             }
 
@@ -116,12 +115,10 @@ class ShortTimeReportService{
 
                 
             }
-
             // Aggiungi 5 minuti all'intervallo corrente
             $this->currentInterval->addMinutes(5);
-            Log::channel('weather_short_report')->info("Short Report created");
         }
-        Log::channel('weather_short_report')->info("-- SHORT REPORT FINISHED --");
+
     }
     private function getEndOfMainInterval(){
         $now=now();
