@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('sky_temperatures', function (Blueprint $table) {
             $table->id();
             $table->float('value',2);

@@ -5,6 +5,7 @@ namespace App\Services\WeatherData\Report;
 use App\Exceptions\LoginFailedException;
 use App\Http\Resources\ShortTimeReportResurces;
 use App\Models\WeatherData\Report\ShortTimeReport;
+use App\Services\ServerLoginService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -36,7 +37,7 @@ class ReportSenderService{
             $data = $data->toArray(request());
 
             $response = Http::accept('application/json')
-            ->withToken(Crypt::decryptString(Cache::get('aut_token')))
+            ->withToken(ServerLoginService::getToken())
             ->post('http://127.0.0.1:8000/api/weatherdata/short/store/',$data);
 
             $data = $response->json();
