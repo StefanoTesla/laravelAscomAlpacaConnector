@@ -13,55 +13,51 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('temperatures', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('humidities', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('pressures', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('winds', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('wind_gusts', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('dew_points', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('rain_rates', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('cloud_covers', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('sky_brightnesses', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
-        Schema::table('sky_temperaturess', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
-            $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
-        });
-        Schema::table('sky_temperaturess', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+        Schema::table('sky_temperatures', function (Blueprint $table) {
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('sky_qualities', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
         Schema::table('rain_rates', function (Blueprint $table) {
-            Schema::dropIfExists('sync');
+            $table->dropColumn('sync');
             $table->integer('sync')->default(SyncStatusEnum::INCOMPLETE);
         });
     }
