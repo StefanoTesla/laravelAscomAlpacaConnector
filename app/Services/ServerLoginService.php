@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class ServerLoginService{
 
 
-    private function login():bool{
+    private static function login():bool{
         $login = 0;
         $retry = 0;
         while (true) {
@@ -27,7 +27,7 @@ class ServerLoginService{
                 case 10:
                     $retry +=1;
                     try{
-                        $this->doLogin();
+                        self::doLogin();
                         $login = 20;
                     } catch (\Throwable $th) {
                         Log::error($th);
@@ -40,7 +40,7 @@ class ServerLoginService{
                     break;
     
                 case 20:
-                    $logged = $this->checkIfLogged();
+                    $logged = self::checkIfLogged();
                     if($logged){
                         return true;
                     } else {
@@ -57,7 +57,7 @@ class ServerLoginService{
         
     }
 
-    private function checkIfLogged():bool{
+    private static function checkIfLogged():bool{
         Log::info("Login check");
         try{
             $response =  Http::accept('application/json')
@@ -76,7 +76,7 @@ class ServerLoginService{
         return false;
     }
 
-    private function doLogin():bool{
+    private static function doLogin():bool{
         $response =  Http::accept('application/json')
             ->post('http://127.0.0.1:8000/api/login',[
                 'email' => env("REMOTE_USER"),
@@ -100,6 +100,8 @@ class ServerLoginService{
         if(self::login()){
             return Crypt::decryptString(Cache::get('aut_token'));
         }
+
+        return null;
     }
 
 }

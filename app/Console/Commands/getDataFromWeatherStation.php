@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\SyncStatusEnum;
 use App\Models\WeatherData\SingleMeasure\DewPoint;
 use App\Models\WeatherData\SingleMeasure\Humidity;
 use App\Models\WeatherData\SingleMeasure\Pressure;
@@ -74,43 +75,43 @@ class GetDataFromWeatherStation extends Command
         Temperature::create([
             'value' => $validated['outdoor_temperature'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         DewPoint::create([
             'value' => $validated['dew_point'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         Humidity::create([
             'value' => $validated['outdoor_humidity'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         Wind::create([
             'value' => $validated['wind_speed'],
             'direction' => $validated['wind_direction'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
         WindGust::create([
             'value' => $validated['gust_speed'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         RainRate::create([
             'value' => $validated['rain_rate'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         Pressure::create([
             'value' => $validated['absolute_pressure'],
             'ack_time' => $now,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
 
         $ascomData = [

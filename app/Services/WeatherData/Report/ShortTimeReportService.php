@@ -2,6 +2,7 @@
 
 namespace App\Services\WeatherData\Report;
 
+use App\Enums\SyncStatusEnum;
 use App\Models\WeatherData\Report\ShortTimeReport;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -164,7 +165,7 @@ class ShortTimeReportService{
 
         $interval = new ShortTimeReport([
             'interval' => $this->endInterval,
-            'sync' => false
+            'sync' => SyncStatusEnum::INCOMPLETE
         ]);
         foreach(self::MODELS as $key => $model){
             $avg = null;
