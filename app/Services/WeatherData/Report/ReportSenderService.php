@@ -31,8 +31,7 @@ class ReportSenderService{
 
             $response = Http::accept('application/json')
             ->withToken(ServerLoginService::getToken())
-            ->post('http://127.0.0.1:8000/api/weatherdata/short/store/',$data);
-
+            ->post(env("REMOTE_DOMAIN").'/api/weatherdata/short/store',$data);
             $data = $response->json();
 
             Log::channel('wt_short_report_sender')->info($response->status());

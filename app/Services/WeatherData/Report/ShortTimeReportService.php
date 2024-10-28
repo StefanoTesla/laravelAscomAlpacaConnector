@@ -4,6 +4,7 @@ namespace App\Services\WeatherData\Report;
 
 use App\Enums\SyncStatusEnum;
 use App\Models\WeatherData\Report\ShortTimeReport;
+use App\Services\WeatherData\Report\ReportSenderService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +19,7 @@ use App\Models\WeatherData\SingleMeasure\SkyBrightness;
 use App\Models\WeatherData\SingleMeasure\SkyQuality;
 use App\Models\WeatherData\SingleMeasure\SkyTemperature;
 use App\Models\WeatherData\SingleMeasure\CloudCover;
-
+use Illuminate\Support\Facades\Artisan;
 
 class ShortTimeReportService{
     private $startMainInterval;
@@ -89,7 +90,7 @@ class ShortTimeReportService{
             $localeEnd = $this->endInterval->copy()->setTimezone('Europe/Rome');
 
             Log::channel('weather_short_report')->info("Handling data from: ". $localeStart->format('Y-m-d H:i') ." to: ". $localeEnd->format('Y-m-d H:i') );
-            
+
             $interval = $this->computeData();
 
 
@@ -101,7 +102,7 @@ class ShortTimeReportService{
                 Log::channel('weather_short_report')->emergency("provo ad eliminarlo");
                 $find = ShortTimeReport::where('interval',$this->endInterval)->delete();
                 if($find){
-                    
+
                     try {
                         Log::channel('weather_short_report')->emergency("Lo risalvo");
                         $interval->save();
@@ -114,10 +115,17 @@ class ShortTimeReportService{
 
                 }
 
-                
+
             }
             // Aggiungi 5 minuti all'intervallo corrente
             $this->currentInterval->addMinutes(5);
+        }
+
+        try {
+            Artisan::call('report:sendreport');
+            Log::channel('weather_short_report')->emergency("dati inviati");
+        } catch (\Throwable $th) {
+            Log::channel('weather_short_report')->emergency("impossibile inviare dati al server {$th}");
         }
 
     }

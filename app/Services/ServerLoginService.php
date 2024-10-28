@@ -14,6 +14,7 @@ class ServerLoginService{
     private static function login():bool{
         $login = 0;
         $retry = 0;
+
         while (true) {
             switch ($login) {
                 case 0:
@@ -23,7 +24,7 @@ class ServerLoginService{
                         $login = 10;
                     }
                     break;
-    
+
                 case 10:
                     $retry +=1;
                     try{
@@ -38,7 +39,7 @@ class ServerLoginService{
                         return false;
                     }
                     break;
-    
+
                 case 20:
                     $logged = self::checkIfLogged();
                     if($logged){
@@ -47,14 +48,14 @@ class ServerLoginService{
                         $login = 10;
                     }
                     break;
-    
+
                 default:
                     Log::error("why I'm here?");
                     break;
             }
         }
 
-        
+
     }
 
     private static function checkIfLogged():bool{
@@ -62,7 +63,7 @@ class ServerLoginService{
         try{
             $response =  Http::accept('application/json')
             ->withToken(Crypt::decryptString(Cache::get('aut_token')))
-            ->get('http://127.0.0.1:8000/api/logged')
+            ->get(env("REMOTE_DOMAIN").'/api/logged')
             ->json();
         } catch (\Throwable $th) {
             Log::info($th);
@@ -78,7 +79,7 @@ class ServerLoginService{
 
     private static function doLogin():bool{
         $response =  Http::accept('application/json')
-            ->post('http://127.0.0.1:8000/api/login',[
+            ->post(env("REMOTE_DOMAIN").'/api/login',[
                 'email' => env("REMOTE_USER"),
                 'password' => env("REMOTE_PSW"),
             ]);

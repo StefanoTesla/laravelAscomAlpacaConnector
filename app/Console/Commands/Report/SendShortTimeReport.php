@@ -12,7 +12,7 @@ class SendShortTimeReport extends Command
      *
      * @var string
      */
-    protected $signature = 'app:send-short-time-report';
+    protected $signature = 'report:sendreport';
 
     /**
      * The console command description.

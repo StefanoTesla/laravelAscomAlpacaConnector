@@ -28,8 +28,7 @@ use PHPUnit\Framework\Constraint\IsFalse;
 class TestController extends Controller
 {
     public function test(Request $request){
- 
-        $rep = new ReportSenderService();
-        $rep->main();
+
+        dd(env("REMOTE_DOMAIN"));
     }
 }
